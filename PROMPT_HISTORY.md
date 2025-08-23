@@ -7,6 +7,78 @@
 
 Vibe Prompting logs go here.
 
+## 2025-08-23
+
+My reviews:
+
+ (Stated goal) only Pipe remote audio to speaker (for now) / to LLM (in the future). We do not pipe  local audio to speaker/llm. 
+ 
+1. We only pipe local audio to WebRTC peer.
+2. Translation Direction Behavior: just labels.
+3. you pick the best one
+4. adding dependency is good.
+5. 1s polling is good
+6. keep all signaling routes in memory is good
+7. yes, shipping phase 1 for now
+
+---
+
+You are a senior WebRTC and Realtime Agent full stack developer. Consider we are building a hackathon MVP, we can safely skip testing & security & privacy for now, and keep the code simple and short, keep it simple & stupid. our goal is do do a great demo presentation.
+
+We are building a two-way speech realtime translation PWA that can capture audio from microphone, send it to other peer via WebRTC, and receive audio from other peer, send audio to LLM realtime API, receive audio from LLM for playing on local speaker.
+
+We support two user to use the PWA, for now, we just build a minimum prove-of-concept MVP. The user journey is:
+
+1. User A open PWA, PWA shows 2 buttons: ZH2EN, EN2ZH. User pick one first, then it displays on top of the screen.
+2. PWA start initializing WebRTC and create an link for other user to visit (shows a QR Code). 
+3. User B scaned the qr code, open browser, automatically start established WebRTC to User A
+4. at the same time, PWA shows a button to User B, the button is the opposite one from User A's choice, because they are translating in different directions. (ZH2EN or EN2ZH)
+5. After WebRTC connections established, PWA start capturing each User's microphone audio stream, and sending them to the other User via WebRTC.
+6. PWA UI shows 2 meters in Kbps: RTC UP, RTC DN, shows the data rate of its RTC data connections
+7. PWA UI has a WebRTC indicator: when there is no WebRTC connection, it is in gray, when there's an active connection, it turns green. when it's in the middle of no connection and active connection, it blinks yellow.
+8. After WebRTC connections established, PWA play the received audio stream in it's speaker.
+9. PWA shows a Quit button, if user click Quit button, terminate WebRTC connection, and show a Thank you for using us message.
+
+Remember this is a hackathon MVP, keep code as less as possible, keep it stupid & simple, make everything concise. Just implement the most basic feature, nothing else, follow the least power principle.
+
+Think hard, plan the initial system code base, apply to the next.js project in this repo. show plan to prepare discuss with me for reviewing.
+
+Ask me question for clarification if needed.
+
+---
+
+By design:
+
+1. the audio stream from MIC should be send to RTC UP to other peer.
+2. the audio stream from RTC DN from other peer should be send to API UP 
+3. the audio stream from API DN should be played on local speaker.
+
+check the related code, review the logic, list them all for my reviewing.
+
+---
+
+*Comprehensive Realtime & Codebase Review Request*
+
+As a senior WebRTC and Realtime Agent full stack developer, review the code base, make sure it implemented our product requirements, align with the problem/pain points as well as solutions and value propositions. Also check the code quality and all the api integration, as well as the WebRTC audio connection logic, make sure everything is work as expected.
+
+Review everything together, list all with a concise explainations and a quality rating score, think hard, 3-pass, be ready to discuss with me before fix/improve them.
+
+---
+
+*MVP Focus Over Hardening Request*
+
+Consider we are building a hackathon MVP, we can safely skip testing & security & privacy for now, and keep the code simple and short, keep it simple & stupid.
+
+Improve the code with high priority for a hackathon MVP, our goal is do do a great demo presentation.
+
+---
+
+*Prompt History Compilation Request*
+
+Get all my prompts in this conversation, keep meaningful lines only, discard those like "fix it", "procceed", 'clean code', 'git commit', etc meaningless lines, then add a very concise summarized title in italic before each original prompt. add `---` between prompts. At last, insert them to the top of PROMPTS_HISTORY.md to the right location, use Python to get date if you need it.
+
+---
+
 ## 2025-08-22
 
 ---
