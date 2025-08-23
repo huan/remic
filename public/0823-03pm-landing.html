@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReMic — Talk freely across languages</title>
+  <meta name="description" content="ReMic is a near-real-time translator for in-person conversations. One toggle, one button. AirPods whisper your language while the other side hears theirs — instantly." />
+  <meta name="theme-color" content="#0ea5e9" />
+
+  <!-- Tailwind & Flowbite CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.css" />
+  <script>
+    // Keep Tailwind defaults; enable dark mode class for a11y toggles if needed
+    tailwind.config = { darkMode: 'class' }
+  </script>
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="ReMic — Talk freely across languages" />
+  <meta property="og:description" content="One toggle, one button. Near-real-time speech-to-speech translation with AirPods and QR connect." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://dummyimage.com/1200x630/0ea5e9/ffffff&text=ReMic" />
+  <meta property="og:url" content="https://remic.app" />
+  <style>
+    /* Simple animated waveform for the hero mock (no assets required) */
+    .wave {
+      background: radial-gradient(1200px 600px at 80% -200px, rgba(14,165,233,0.20), transparent 60%),
+                  radial-gradient(1000px 500px at -200px 60%, rgba(99,102,241,0.18), transparent 60%),
+                  linear-gradient(135deg, rgba(59,130,246,0.10), rgba(14,165,233,0.08));
+    }
+    .pulse-dot {
+      animation: ping 2.2s cubic-bezier(0,0,0.2,1) infinite;
+    }
+    @keyframes ping {
+      75%, 100% { transform: scale(1.75); opacity: 0; }
+    }
+    .countup[data-done="1"]::after { content: ''; } /* no extra symbol */
+  </style>
+</head>
+
+<body class="bg-white text-gray-900 antialiased">
+  <!-- Sticky header -->
+  <header class="fixed inset-x-0 top-0 z-40 border-b border-gray-200 bg-white/80 backdrop-blur">
+    <nav class="mx-auto flex max-w-7xl items-center justify-between p-4 lg:px-8">
+      <a href="#" class="flex items-center gap-2 font-semibold text-gray-900">
+        <!-- Logo -->
+        <span class="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-sky-500 text-white">
+          <!-- wave icon -->
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" class="drop-shadow-sm">
+            <path d="M3 12c2 0 2-6 4-6s2 12 4 12 2-12 4-12 2 6 4 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span class="text-xl">ReMic</span>
+      </a>
+      <button data-collapse-toggle="nav" type="button" class="inline-flex items-center rounded-lg p-2 text-gray-600 hover:bg-gray-100 lg:hidden" aria-controls="nav" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      </button>
+      <div class="hidden lg:block" id="nav">
+        <ul class="flex items-center gap-6 text-sm font-medium">
+          <li><a href="#features" class="hover:text-sky-600">Features</a></li>
+          <li><a href="#how" class="hover:text-sky-600">How it works</a></li>
+          <li><a href="#demo" class="hover:text-sky-600">Demo</a></li>
+          <li><a href="#use-cases" class="hover:text-sky-600">Use cases</a></li>
+          <li><a href="#pricing" class="hover:text-sky-600">Pricing</a></li>
+          <li><a href="#faq" class="hover:text-sky-600">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="hidden items-center gap-3 lg:flex">
+        <a href="#waitlist" class="text-sm font-semibold text-gray-900 hover:text-sky-600">Join waitlist</a>
+        <a href="#demo" data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300">
+          Watch 30s Demo
+        </a>
+      </div>
+    </nav>
+    <!-- mobile -->
+    <div class="hidden border-t border-gray-200 bg-white lg:hidden" id="nav">
+      <ul class="space-y-1 p-4 text-sm font-medium">
+        <li><a href="#features" class="block rounded-lg p-2 hover:bg-gray-50">Features</a></li>
+        <li><a href="#how" class="block rounded-lg p-2 hover:bg-gray-50">How it works</a></li>
+        <li><a href="#demo" class="block rounded-lg p-2 hover:bg-gray-50">Demo</a></li>
+        <li><a href="#use-cases" class="block rounded-lg p-2 hover:bg-gray-50">Use cases</a></li>
+        <li><a href="#pricing" class="block rounded-lg p-2 hover:bg-gray-50">Pricing</a></li>
+        <li><a href="#faq" class="block rounded-lg p-2 hover:bg-gray-50">FAQ</a></li>
+        <li class="pt-2 flex gap-2">
+          <a href="#waitlist" class="inline-flex w-full items-center justify-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold hover:bg-gray-50">Join waitlist</a>
+          <a href="#demo" data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="inline-flex w-full items-center justify-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700">Watch Demo</a>
+        </li>
+      </ul>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden pt-28 sm:pt-32">
+    <div class="mx-auto grid max-w-7xl items-center gap-10 px-4 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8">
+      <div>
+        <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1 text-xs font-medium text-gray-600">
+          <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Live prototype • ~<span class="countup" data-target="80">0</span> ms latency
+        </span>
+        <h1 class="mt-4 text-4xl font-extrabold tracking-tight text-gray-900 sm:text-5xl">
+          Talk freely <span class="text-sky-600">across languages</span>.
+        </h1>
+        <p class="mt-4 text-lg leading-7 text-gray-600">
+          <strong>ReMic</strong> is a near‑real‑time translator for in‑person conversations. One toggle, one button.
+          Your AirPods whisper your language while the other side hears theirs — <em>in the flow</em>.
+        </p>
+
+        <!-- Email capture -->
+        <form id="hero-form" class="mt-6 flex w-full flex-col gap-3 sm:flex-row">
+          <div class="relative flex-1">
+            <label for="email" class="sr-only">Email</label>
+            <input id="email" name="email" type="email" required placeholder="you@domain.com" class="block w-full rounded-lg border border-gray-300 p-3 text-gray-900 placeholder:text-gray-400 focus:border-sky-500 focus:ring-sky-500" />
+          </div>
+          <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300">
+            Get TestFlight Invite
+          </button>
+        </form>
+        <p class="mt-2 text-xs text-gray-500">No spam. We’ll email a TestFlight link when slots open.</p>
+
+        <!-- Chips / social proof -->
+        <div class="mt-6 flex flex-wrap items-center gap-2 text-xs text-gray-600">
+          <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1">
+            <svg class="h-4 w-4 text-sky-600" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-6 4-6s2 12 4 12 2-12 4-12 2 6 4 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+            AirPods whisper mode
+          </span>
+          <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1">QR / NFC connect</span>
+          <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1">WebRTC direct</span>
+          <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-2 py-1">Style filters</span>
+        </div>
+
+        <!-- Secondary CTAs -->
+        <div class="mt-6 flex items-center gap-3">
+          <a href="#demo" data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-4 py-2 font-semibold hover:bg-gray-50">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+            Watch 30s demo
+          </a>
+          <a href="#how" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-700 hover:text-sky-600">How it works →</a>
+        </div>
+      </div>
+
+      <!-- Visual mock -->
+      <div class="relative">
+        <div class="wave relative aspect-[5/3] w-full overflow-hidden rounded-2xl border border-gray-200 shadow-lg">
+          <!-- latency pill -->
+          <div class="absolute right-3 top-3 flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-medium text-gray-600 shadow-sm ring-1 ring-gray-200">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Connected • ~<span class="countup" data-target="80">0</span> ms
+          </div>
+          <!-- phone-ish card -->
+          <div class="absolute inset-6 rounded-2xl bg-white/70 p-4 backdrop-blur">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2 text-sm text-gray-700">
+                <span class="inline-flex items-center gap-1 rounded-md bg-gray-100 px-2 py-1">ZH ↔ EN</span>
+                <span class="hidden sm:inline">Style:</span>
+                <span class="rounded-md border border-gray-200 px-2 py-1 text-gray-800">YC Pitch</span>
+              </div>
+              <div class="relative h-2 w-2">
+                <span class="pulse-dot absolute inline-flex h-2 w-2 rounded-full bg-emerald-500 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-600"></span>
+              </div>
+            </div>
+            <div class="mt-4 h-36 rounded-lg border border-dashed border-gray-200 p-3 text-sm text-gray-500">
+              Live transcript…
+              <div class="mt-2 text-gray-800">你今天过得怎么样？</div>
+              <div class="text-gray-500">→ “How’s your day going?”</div>
+            </div>
+            <div class="mt-4 flex items-center justify-center">
+              <button class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-sky-600 text-white shadow-lg hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300">
+                <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none"><path d="M12 18a3 3 0 003-3V9a3 3 0 10-6 0v6a3 3 0 003 3z" stroke="currentColor" stroke-width="2"/><path d="M19 11v1a7 7 0 11-14 0v-1" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+        <p class="mt-3 text-xs text-gray-500">Mock UI for illustration—actual prototype uses low‑latency streaming.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="mx-auto mt-16 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid gap-6 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:grid-cols-3">
+      <div>
+        <div class="text-3xl font-extrabold text-gray-900"><span class="countup" data-target="1.5" data-decimal="1">0</span>s</div>
+        <p class="mt-1 text-sm text-gray-600">Target speech‑to‑speech delay</p>
+      </div>
+      <div>
+        <div class="text-3xl font-extrabold text-gray-900">1 <span class="text-base font-bold text-gray-500">button</span></div>
+        <p class="mt-1 text-sm text-gray-600">Push‑to‑talk simplicity</p>
+      </div>
+      <div>
+        <div class="text-3xl font-extrabold text-gray-900"><span class="countup" data-target="2">0</span>+ langs</div>
+        <p class="mt-1 text-sm text-gray-600">Start with EN ↔ ZH; expand by demand</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section id="features" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Why ReMic converts moments into conversations</h2>
+      <p class="mt-3 text-lg text-gray-600">Designed for the real world—fast, hands‑free, and easy for both sides.</p>
+    </div>
+
+    <div class="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <!-- Card -->
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <div class="inline-flex rounded-lg bg-sky-50 p-2 text-sky-600">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M21 15V9a2 2 0 00-2-2h-1V5a2 2 0 00-2-2H8a2 2 0 00-2 2v2H5a2 2 0 00-2 2v6" stroke="currentColor" stroke-width="2"/><path d="M7 7h10v10a2 2 0 01-2 2H9a2 2 0 01-2-2V7z" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">One toggle, one button</h3>
+        <p class="mt-2 text-sm text-gray-600">Less fiddling, more talking. Push‑to‑talk and flip direction instantly.</p>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <div class="inline-flex rounded-lg bg-violet-50 p-2 text-violet-600">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M12 3v18M3 12h18" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Style filters</h3>
+        <p class="mt-2 text-sm text-gray-600">YC Pitch, Neutral Pro, or Warm & Slow—tune tone to context on the fly.</p>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <div class="inline-flex rounded-lg bg-emerald-50 p-2 text-emerald-600">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h10M4 18h6" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">AirPods whisper mode</h3>
+        <p class="mt-2 text-sm text-gray-600">Hear your language privately with quality mics and noise filtering.</p>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <div class="inline-flex rounded-lg bg-amber-50 p-2 text-amber-600">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M7 7h10v10H7z" stroke="currentColor" stroke-width="2"/><path d="M4 7h16M7 4v16" stroke="currentColor" stroke-width="2"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">QR / NFC connect</h3>
+        <p class="mt-2 text-sm text-gray-600">Pair phones in seconds. No accounts required for guests.</p>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <div class="inline-flex rounded-lg bg-rose-50 p-2 text-rose-600">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M7 8h10M7 12h6M5 21l2-4h10l2 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Bilingual transcripts</h3>
+        <p class="mt-2 text-sm text-gray-600">See both sides live. Save useful phrases for later.</p>
+      </div>
+
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <div class="inline-flex rounded-lg bg-gray-100 p-2 text-gray-700">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Built for the moment</h3>
+        <p class="mt-2 text-sm text-gray-600">Clinics, schools, stores, neighbors—talk naturally, stay present.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">How it works</h2>
+      <p class="mt-3 text-lg text-gray-600">Three steps. Under a minute.</p>
+    </div>
+    <div class="mt-10 grid gap-6 sm:grid-cols-3">
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-600 text-white">1</span>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Set languages & style</h3>
+        <p class="mt-2 text-sm text-gray-600">Pick who hears what (EN ↔ ZH) and choose YC Pitch, Neutral Pro, or Warm & Slow.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-600 text-white">2</span>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Connect by QR / NFC</h3>
+        <p class="mt-2 text-sm text-gray-600">Guest scans and joins—no login. Web app fallback when needed.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-6">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-600 text-white">3</span>
+        <h3 class="mt-4 text-lg font-semibold text-gray-900">Push to talk</h3>
+        <p class="mt-2 text-sm text-gray-600">You speak; they hear—clean, confident, and fast. End with one tap.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="grid items-center gap-8 lg:grid-cols-2">
+      <div>
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">See it in 30 seconds</h2>
+        <p class="mt-3 text-lg text-gray-600">This is the moment you feel “oh—this is different.”</p>
+        <div class="mt-6 flex gap-3">
+          <a data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="inline-flex cursor-pointer items-center gap-2 rounded-lg bg-sky-600 px-5 py-3 font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300">
+            <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+            Watch demo
+          </a>
+          <a href="#waitlist" class="inline-flex items-center gap-2 rounded-lg border border-gray-200 px-5 py-3 font-semibold hover:bg-gray-50">
+            Get invite
+          </a>
+        </div>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-2">
+        <div class="aspect-video overflow-hidden rounded-xl">
+          <!-- Fallback thumbnail with play overlay -->
+          <button data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="group relative block h-full w-full bg-gray-100">
+            <div class="absolute inset-0 grid place-items-center">
+              <span class="inline-flex h-16 w-16 items-center justify-center rounded-full bg-white/90 shadow-lg ring-1 ring-gray-200 group-hover:scale-105 transition">
+                <svg class="h-7 w-7 text-sky-600" fill="currentColor" viewBox="0 0 20 20"><path d="M4 4l12 6-12 6V4z"/></svg>
+              </span>
+            </div>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Use cases -->
+  <section id="use-cases" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Built for everyday life—and showtime</h2>
+      <p class="mt-3 text-lg text-gray-600">From neighbors to clinics to pitch day.</p>
+    </div>
+    <div class="mt-10 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div class="rounded-2xl border border-gray-200 p-5">
+        <h3 class="font-semibold text-gray-900">Family & neighbors</h3>
+        <p class="mt-2 text-sm text-gray-600">Casual chats that don’t stall. “Hello” becomes a real conversation.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-5">
+        <h3 class="font-semibold text-gray-900">Clinics & schools</h3>
+        <p class="mt-2 text-sm text-gray-600">Faster intake, clearer updates, less stress on staff and families.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-5">
+        <h3 class="font-semibold text-gray-900">Local businesses</h3>
+        <p class="mt-2 text-sm text-gray-600">Serve customers in their language—naturally and quickly.</p>
+      </div>
+      <div class="rounded-2xl border border-gray-200 p-5">
+        <h3 class="font-semibold text-gray-900">Pitch & public speaking</h3>
+        <p class="mt-2 text-sm text-gray-600">Your words; the audience’s language. With the right tone.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Early access pricing</h2>
+      <p class="mt-3 text-lg text-gray-600">Start free while we scale—upgrade when you need more.</p>
+    </div>
+    <div class="mx-auto mt-10 grid max-w-5xl gap-6 md:grid-cols-2">
+      <div class="relative rounded-2xl border border-gray-200 p-6">
+        <span class="absolute right-4 top-4 rounded-full bg-gray-100 px-3 py-1 text-xs font-medium text-gray-700">Popular</span>
+        <h3 class="text-lg font-semibold text-gray-900">Early Access</h3>
+        <div class="mt-2 text-3xl font-extrabold text-gray-900">$0</div>
+        <p class="mt-1 text-sm text-gray-600">Limited slots, usage caps</p>
+        <ul class="mt-4 space-y-2 text-sm text-gray-700">
+          <li>• EN ↔ ZH speech‑to‑speech</li>
+          <li>• QR / NFC connect</li>
+          <li>• Style filters: YC Pitch, Neutral Pro, Warm & Slow</li>
+          <li>• Live transcripts</li>
+        </ul>
+        <a href="#waitlist" class="mt-6 inline-flex w-full items-center justify-center rounded-lg bg-sky-600 px-5 py-3 font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300">Join the waitlist</a>
+      </div>
+
+      <div class="relative rounded-2xl border border-gray-200 p-6">
+        <span class="absolute right-4 top-4 rounded-full bg-sky-50 px-3 py-1 text-xs font-medium text-sky-700">Coming soon</span>
+        <h3 class="text-lg font-semibold text-gray-900">Pro</h3>
+        <div class="mt-2 text-3xl font-extrabold text-gray-900">TBD</div>
+        <p class="mt-1 text-sm text-gray-600">For power users & teams</p>
+        <ul class="mt-4 space-y-2 text-sm text-gray-700">
+          <li>• More languages</li>
+          <li>• Group mode & diarization</li>
+          <li>• Shared phrasebooks</li>
+          <li>• Admin & usage analytics</li>
+        </ul>
+        <a href="#waitlist" class="mt-6 inline-flex w-full items-center justify-center rounded-lg border border-gray-200 px-5 py-3 font-semibold hover:bg-gray-50">Get notified</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="mx-auto max-w-3xl text-center">
+      <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">FAQ</h2>
+      <p class="mt-3 text-lg text-gray-600">Quick answers to common questions.</p>
+    </div>
+    <div class="mx-auto mt-8 max-w-3xl divide-y divide-gray-200 rounded-2xl border border-gray-200">
+      <details class="group p-6">
+        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold text-gray-900">
+          How fast is it?
+          <span class="ml-4 text-gray-400 group-open:rotate-180 transition">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
+          </span>
+        </summary>
+        <p class="mt-3 text-sm text-gray-600">Our target speech‑to‑speech delay is ~1–2 seconds. Per leg latency depends on network quality and device audio paths.</p>
+      </details>
+      <details class="group p-6">
+        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold text-gray-900">
+          Do both people need the app?
+          <span class="ml-4 text-gray-400 group-open:rotate-180 transition">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
+          </span>
+        </summary>
+        <p class="mt-3 text-sm text-gray-600">Only one device needs ReMic. The other side can join via QR to a lightweight web session if they prefer.</p>
+      </details>
+      <details class="group p-6">
+        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold text-gray-900">
+          Which languages are supported?
+          <span class="ml-4 text-gray-400 group-open:rotate-180 transition">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
+          </span>
+        </summary>
+        <p class="mt-3 text-sm text-gray-600">We’re starting with EN ↔ ZH during early access and will expand based on demand.</p>
+      </details>
+      <details class="group p-6">
+        <summary class="flex cursor-pointer list-none items-center justify-between font-semibold text-gray-900">
+          Is there a transcript?
+          <span class="ml-4 text-gray-400 group-open:rotate-180 transition">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none"><path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2"/></svg>
+          </span>
+        </summary>
+        <p class="mt-3 text-sm text-gray-600">Yes. You can view both sides live, save phrases, and end the session with one tap.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- Waitlist -->
+  <section id="waitlist" class="mx-auto mt-20 max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm sm:p-10">
+      <div class="mx-auto max-w-3xl text-center">
+        <h2 class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Be first to talk without friction</h2>
+        <p class="mt-3 text-lg text-gray-600">Join the TestFlight and help us shape ReMic.</p>
+      </div>
+      <form id="waitlist-form" class="mx-auto mt-6 flex max-w-xl flex-col gap-3 sm:flex-row">
+        <input type="email" name="email" required placeholder="you@domain.com" class="block w-full rounded-lg border border-gray-300 p-3 text-gray-900 placeholder:text-gray-400 focus:border-sky-500 focus:ring-sky-500" />
+        <button class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-300">Join waitlist</button>
+      </form>
+      <p class="mt-2 text-center text-xs text-gray-500">We’ll notify you as slots open.</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="mt-24 border-t border-gray-200">
+    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <div class="flex flex-col items-center justify-between gap-6 sm:flex-row">
+        <div class="flex items-center gap-2">
+          <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-500 text-white">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M3 12c2 0 2-6 4-6s2 12 4 12 2-12 4-12 2 6 4 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+          </span>
+          <span class="font-semibold">ReMic</span>
+        </div>
+        <ul class="flex items-center gap-5 text-sm text-gray-600">
+          <li><a href="#features" class="hover:text-sky-600">Features</a></li>
+          <li><a href="#pricing" class="hover:text-sky-600">Pricing</a></li>
+          <li><a href="#faq" class="hover:text-sky-600">FAQ</a></li>
+        </ul>
+        <p class="text-xs text-gray-500">© <span id="year"></span> ReMic. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Sticky bottom CTA -->
+  <div class="fixed inset-x-0 bottom-0 z-40 border-t border-gray-200 bg-white/95 p-3 backdrop-blur">
+    <div class="mx-auto flex max-w-7xl items-center justify-between gap-3">
+      <p class="truncate text-sm text-gray-700"><strong>ReMic:</strong> One toggle, one button—near‑real‑time translation for real conversations.</p>
+      <div class="flex gap-2">
+        <a href="#demo" data-modal-target="demo-modal" data-modal-toggle="demo-modal" class="hidden rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold hover:bg-gray-50 sm:inline-flex">Watch demo</a>
+        <a href="#waitlist" class="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700">Get TestFlight Invite</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Demo Modal (Flowbite) -->
+  <div id="demo-modal" tabindex="-1" aria-hidden="true" class="fixed inset-0 z-50 hidden overflow-y-auto overflow-x-hidden">
+    <div class="relative mx-auto my-8 w-full max-w-4xl p-4">
+      <div class="relative rounded-lg bg-white shadow">
+        <div class="flex items-center justify-between border-b p-4">
+          <h3 class="text-lg font-semibold text-gray-900">ReMic — 30s demo</h3>
+          <button type="button" class="ms-auto inline-flex items-center rounded-lg bg-transparent p-2 text-sm text-gray-400 hover:bg-gray-200 hover:text-gray-900" data-modal-hide="demo-modal">
+            <svg class="h-4 w-4" viewBox="0 0 14 14" fill="none"><path d="M1 1l12 12M13 1L1 13" stroke="currentColor" stroke-width="2"/></svg>
+          </button>
+        </div>
+        <div class="p-4">
+          <div class="aspect-video overflow-hidden rounded-lg">
+            <!-- Replace the src with your video; YouTube embed with autoplay+mute -->
+            <iframe id="demo-iframe" class="h-full w-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&mute=1&rel=0&modestbranding=1" title="ReMic Demo" allow="autoplay; encrypted-media" referrerpolicy="strict-origin-when-cross-origin"></iframe>
+          </div>
+        </div>
+        <div class="flex items-center justify-end gap-3 border-t p-4">
+          <a href="#waitlist" class="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700">Join waitlist</a>
+          <button data-modal-hide="demo-modal" class="inline-flex items-center rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold hover:bg-gray-50">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
+  <script>
+    // Year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Simple CountUp (no external lib)
+    const animate = (el) => {
+      if (el.dataset.done === "1") return;
+      const target = parseFloat(el.dataset.target || '0');
+      const decimal = el.dataset.decimal ? parseInt(el.dataset.decimal) : 0;
+      const dur = 900;
+      const start = performance.now();
+      const from = 0;
+      const step = (t) => {
+        const p = Math.min(1, (t - start) / dur);
+        const val = from + (target - from) * p;
+        el.textContent = val.toFixed(decimal);
+        if (p < 1) requestAnimationFrame(step); else el.dataset.done = "1";
+      };
+      requestAnimationFrame(step);
+    };
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if (e.isIntersecting) animate(e.target); });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.countup').forEach(el => io.observe(el));
+
+    // Simple faux-submit handlers (replace with real endpoint)
+    const submitToConsole = (formId) => {
+      const form = document.getElementById(formId);
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = (new FormData(form)).get('email');
+        alert(`Thanks! We'll send your TestFlight invite to: ${email}`);
+        form.reset();
+      });
+    };
+    submitToConsole('hero-form');
+    submitToConsole('waitlist-form');
+
+    // Reset/stop demo video when modal closes
+    const modal = document.getElementById('demo-modal');
+    const iframe = document.getElementById('demo-iframe');
+    modal?.addEventListener('hide.tw.modal', () => {
+      const src = iframe.getAttribute('src');
+      iframe.setAttribute('src', src); // reload to stop playback
+    });
+  </script>
+</body>
+</html>
