@@ -10,7 +10,8 @@ Minimal **audio-only** WebRTC demo tailored for realtime voice:
 ```bash
 npm i
 npm start
-# open http://localhost:3000 in two tabs/devices
+ngrok http 3000 # for required https
+# open http://xxx.ngrok:3000 in two tabs/devices, best in same network without isolation
 ```
 
 ## TURN setup (coturn)
