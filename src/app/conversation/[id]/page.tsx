@@ -30,6 +30,17 @@ export default function ConversationPage({ params }: { params: { id: string } })
     isHost: false
   })
   const [conversationId] = useState(params.id)
+  const [showOtherLanguage, setShowOtherLanguage] = useState(false)
+  const [messages, setMessages] = useState([
+    { id: 1, content: "Hello! How are you today?" },
+    { id: 2, content: "I'm doing well, thank you! How about you?" },
+    { id: 3, content: "Great! I'm excited to practice languages with you." },
+    { id: 4, content: "That sounds wonderful! What would you like to talk about?" },
+    { id: 5, content: "Maybe we could discuss our favorite foods?" },
+    { id: 6, content: "I love that idea! I'm always curious about different cuisines." },
+    { id: 7, content: "What's your favorite dish from your country?" },
+    { id: 8, content: "I really enjoy pasta, especially carbonara. What about you?" },
+  ])
   const { joinRoom, setLanguage, otherLanguage, isConnected } = useSocket()
 
   useEffect(() => {
@@ -98,7 +109,7 @@ export default function ConversationPage({ params }: { params: { id: string } })
           {!state.myLanguage ? (
             <div className="bg-gradient-to-t from-[#D3D3D3] to-[#FFF] rounded-2xl p-6 shadow-lg">
               <h2 className="text-gray-800 text-lg font-medium mb-4">Choose Your Language</h2>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-3 mb-4">
                 {languages.slice(0, 6).map((language) => (
                   <button
                     key={language.code}
@@ -110,6 +121,15 @@ export default function ConversationPage({ params }: { params: { id: string } })
                   </button>
                 ))}
               </div>
+              
+              {/* Other person's language in picker */}
+              <div className="text-center text-gray-600 text-xs">
+                {state.otherLanguage ? (
+                  <span>Other person speaks {getLanguageFlag(state.otherLanguage)} {getLanguageName(state.otherLanguage)}</span>
+                ) : (
+                  <span>Other person: waiting for selection...</span>
+                )}
+              </div>
             </div>
           ) : (
             <button
@@ -117,23 +137,39 @@ export default function ConversationPage({ params }: { params: { id: string } })
                 setState(prev => ({ ...prev, myLanguage: null }))
                 localStorage.removeItem(`conversation_${conversationId}_my_language`)
                 setLanguage('') // Clear language on WebSocket
+                setShowOtherLanguage(false) // Hide other language info when changing
               }}
-              className="w-full bg-gradient-to-t from-[#D3D3D3] to-[#FFF] hover:bg-white gap-3 rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between"
+              className="w-full bg-gradient-to-t from-[#D3D3D3] to-[#FFF] hover:bg-white gap-3 rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
             >
               <div className="text-4xl">{getLanguageFlag(state.myLanguage)}</div>
-              <span className="text-gray-600 text-2xl">↔</span>
-              <div className="text-4xl">{state.otherLanguage ? getLanguageFlag(state.otherLanguage) : '⏳'}</div>
+              <span className="text-gray-800 font-medium text-lg">{getLanguageName(state.myLanguage)}</span>
             </button>
           )}
         </div>
 
-        {/* Main conversation area can go here */}
-        <div className="space-y-5 mb-56">
-          <div className="text-white/60 text-lg">
-            {state.myLanguage && state.otherLanguage 
-              ? "Ready to start your conversation!" 
-              : "Waiting for both people to select languages..."}
-          </div>
+        {/* Messages Area */}
+        <div className="w-full max-w-2xl mx-auto relative">
+          {state.myLanguage && state.otherLanguage ? (
+            <div 
+              className="h-96 overflow-y-auto px-4 scrollbar-hide mb-20"
+              style={{
+                maskImage: 'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)',
+                WebkitMaskImage: 'linear-gradient(to bottom, transparent 0px, black 32px, black calc(100% - 32px), transparent 100%)'
+              }}
+            >
+              <div className="flex flex-col gap-8 text-left text-lg">
+                {messages.map((message) => (
+                  <p key={message.id} className="text-white/75">
+                    {message.content}
+                  </p>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="text-white/60 text-lg text-center py-20">
+              Waiting for both people to select languages...
+            </div>
+          )}
         </div>
       </div>
 
