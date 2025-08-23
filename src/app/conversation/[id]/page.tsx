@@ -91,85 +91,50 @@ export default function ConversationPage({ params }: { params: { id: string } })
       />
 
       {/* Content */}
-      <div className="relative z-30 flex flex-col items-center justify-center text-center max-w-2xl mx-auto">
-        {/* Header */}
-        <div className="mb-12">
-          <h1 className="text-white text-4xl font-bold mb-4">Language Exchange</h1>
-          <p className="text-white/80 text-xl">
-            Conversation ID: <span className="font-mono bg-white/20 px-2 py-1 rounded">{conversationId}</span>
-          </p>
-          <p className="text-white/60 text-lg mt-2">
-            {state.isHost ? "You created this conversation" : "You joined this conversation"}
-          </p>
+      <div className="relative z-30 flex flex-col items-center justify-center text-center max-w-md mx-auto">
+        
+        {/* Compact Language Picker at Top */}
+        <div className="mb-32">
+          {!state.myLanguage ? (
+            <div className="bg-gradient-to-t from-[#D3D3D3] to-[#FFF] rounded-2xl p-6 shadow-lg">
+              <h2 className="text-gray-800 text-lg font-medium mb-4">Choose Your Language</h2>
+              <div className="grid grid-cols-3 gap-3">
+                {languages.slice(0, 6).map((language) => (
+                  <button
+                    key={language.code}
+                    onClick={() => selectLanguage(language.code)}
+                    className="bg-white/50 hover:bg-white text-gray-800 p-3 rounded-xl transition-all duration-200 hover:scale-105"
+                  >
+                    <div className="text-2xl mb-1">{language.flag}</div>
+                    <div className="text-xs font-medium">{language.name}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setState(prev => ({ ...prev, myLanguage: null }))
+                localStorage.removeItem(`conversation_${conversationId}_my_language`)
+                setLanguage('') // Clear language on WebSocket
+              }}
+              className="w-full bg-gradient-to-t from-[#D3D3D3] to-[#FFF] hover:bg-white gap-3 rounded-2xl px-6 py-3 shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between"
+            >
+              <div className="text-4xl">{getLanguageFlag(state.myLanguage)}</div>
+              <span className="text-gray-600 text-2xl">↔</span>
+              <div className="text-4xl">{state.otherLanguage ? getLanguageFlag(state.otherLanguage) : '⏳'}</div>
+            </button>
+          )}
         </div>
 
-        {/* Language Selection */}
-        {!state.myLanguage && (
-          <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-8 mb-8">
-            <h2 className="text-white text-2xl font-semibold mb-6">Choose Your Language</h2>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {languages.map((language) => (
-                <button
-                  key={language.code}
-                  onClick={() => selectLanguage(language.code)}
-                  className="bg-white/20 hover:bg-white/30 text-white p-4 rounded-xl transition-all duration-200 hover:scale-105"
-                >
-                  <div className="text-3xl mb-2">{language.flag}</div>
-                  <div className="font-medium">{language.name}</div>
-                </button>
-              ))}
-            </div>
+        {/* Main conversation area can go here */}
+        <div className="space-y-5 mb-56">
+          <div className="text-white/60 text-lg">
+            {state.myLanguage && state.otherLanguage 
+              ? "Ready to start your conversation!" 
+              : "Waiting for both people to select languages..."}
           </div>
-        )}
-
-        {/* Language Display */}
-        {state.myLanguage && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-            {/* My Language */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-              <h3 className="text-white text-xl font-semibold mb-4">Your Language</h3>
-              <div className="text-center">
-                <div className="text-6xl mb-4">{getLanguageFlag(state.myLanguage)}</div>
-                <div className="text-white text-2xl font-bold">{getLanguageName(state.myLanguage)}</div>
-              </div>
-              <button
-                onClick={() => {
-                  setState(prev => ({ ...prev, myLanguage: null }))
-                  localStorage.removeItem(`conversation_${conversationId}_my_language`)
-                  setLanguage('') // Clear language on WebSocket
-                }}
-                className="mt-4 w-full px-4 py-2 bg-red-500/80 hover:bg-red-500 text-white rounded-lg transition-colors"
-              >
-                Change Language
-              </button>
-            </div>
-
-            {/* Other Person's Language */}
-            <div className="bg-white/10 backdrop-blur-sm rounded-2xl p-6">
-              <h3 className="text-white text-xl font-semibold mb-4">Other Person's Language</h3>
-              {state.otherLanguage ? (
-                <div className="text-center">
-                  <div className="text-6xl mb-4">{getLanguageFlag(state.otherLanguage)}</div>
-                  <div className="text-white text-2xl font-bold">{getLanguageName(state.otherLanguage)}</div>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <div className="text-4xl mb-4">⏳</div>
-                  <div className="text-white/60 text-lg">Waiting for other person to choose...</div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Instructions */}
-        {state.myLanguage && (
-          <div className="mt-8 text-center">
-            <p className="text-white/60 text-sm">
-              Share this conversation ID with someone else: <span className="font-mono bg-white/20 px-2 py-1 rounded">{conversationId}</span>
-            </p>
-          </div>
-        )}
+        </div>
       </div>
 
       {/* Brand Name */}
