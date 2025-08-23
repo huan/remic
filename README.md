@@ -129,7 +129,8 @@ Design goal: **clean, obvious, immigrant-friendly**.
 
 ## 🙋 Team
 
-- **Lead:** Huan Li (@huan) – Builder, coder, founder  
+- **Lead:** Huan Li (@huan) – Builder, coder, founder
+- **Designer & Frontend:** Oliver Cingl - Founder, hacker, builder
 - **Open roles:** 1 × Designer (UI/UX polish), optional 1 × Audio/WebRTC wrangler  
 
 ---
