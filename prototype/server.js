@@ -54,8 +54,8 @@ Output: Only the interpreted English sentence(s). Nothing else.
         instructions: prompt,
         turn_detection: {
           type: 'server_vad',
-          threshold: 0.6,
-          silence_duration_ms: 180
+          threshold: 0.95,
+          silence_duration_ms: 200
         }
       })
     });
