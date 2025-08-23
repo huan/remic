@@ -102,7 +102,7 @@ export default function JoinConversation() {
         {/* Testimonial */}
         <div className="mb-24">
           <p className="text-white/80 text-2xl px-8 md:text-2xl font-light leading-8">
-            Scan the QR code on the other person's device
+            Scan the QR code on the other person&apos;s device
           </p>
         </div>
 

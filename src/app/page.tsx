@@ -197,7 +197,7 @@ export default function Home() {
         <div className="grid items-center gap-10 md:grid-cols-2">
           <div>
             <h2 className="text-3xl font-bold">See it in action</h2>
-            <p className="mt-3 text-gray-600">We'll demo live: EN→ZH to AirPods, then ZH→EN to room speakers. Flip styles on the fly—try "YC Pitch."</p>
+            <p className="mt-3 text-gray-600">We&apos;ll demo live: EN→ZH to AirPods, then ZH→EN to room speakers. Flip styles on the fly—try &ldquo;YC Pitch.&rdquo;</p>
             <div className="mt-6 flex gap-3">
               <button data-modal-target="demo-modal" data-modal-toggle="demo-modal" className="inline-flex items-center rounded-lg bg-gray-900 px-5 py-3 text-white font-medium hover:bg-gray-800">▶︎ Play Demo</button>
               <a href="#" className="inline-flex items-center rounded-lg border border-gray-300 px-5 py-3 font-medium hover:bg-gray-50">View GitHub</a>
@@ -224,7 +224,7 @@ export default function Home() {
           <div className="grid gap-8 md:grid-cols-2">
             <div className="rounded-2xl border border-gray-200 bg-white p-8">
               <h3 className="text-2xl font-bold">Join Early Access</h3>
-              <p className="mt-2 text-gray-600">Be the first to try ReMic. We're prioritizing families, clinics, schools, and local shops.</p>
+              <p className="mt-2 text-gray-600">Be the first to try ReMic. We&apos;re prioritizing families, clinics, schools, and local shops.</p>
               <form className="mt-6 space-y-4" action="mailto:huan@chatie.io" method="post" encType="text/plain">
                 <div>
                   <label htmlFor="email" className="mb-2 block text-sm font-medium text-gray-900">Email</label>
@@ -235,7 +235,7 @@ export default function Home() {
                   <input id="use" name="use" type="text" className="block w-full rounded-lg border border-gray-300 p-2.5" placeholder="e.g., Mom & neighbors, clinic intake, school office…" />
                 </div>
                 <button type="submit" className="w-full rounded-lg bg-gray-900 px-5 py-3 text-white font-medium hover:bg-gray-800">Request TestFlight</button>
-                <p className="text-xs text-gray-500">No spam. We'll email a TestFlight link if selected.</p>
+                <p className="text-xs text-gray-500">No spam. We&apos;ll email a TestFlight link if selected.</p>
               </form>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-8">
@@ -265,7 +265,7 @@ export default function Home() {
         </div>
         <div className="mt-10 grid gap-6 md:grid-cols-2">
           <div className="rounded-2xl border border-gray-200 p-6">
-            <h3 className="font-semibold">Is it really "real-time"?</h3>
+            <h3 className="font-semibold">Is it really &ldquo;real-time&rdquo;?</h3>
             <p className="mt-2 text-gray-600">We optimize for first audible words under ~700–1500ms and typical full sentence under ~2s with good network.</p>
           </div>
           <div className="rounded-2xl border border-gray-200 p-6">
@@ -274,7 +274,7 @@ export default function Home() {
           </div>
           <div className="rounded-2xl border border-gray-200 p-6">
             <h3 className="font-semibold">Do I need AirPods?</h3>
-            <p className="mt-2 text-gray-600">Recommended for the wearer's private audio. The iPhone speaker covers the other side.</p>
+            <p className="mt-2 text-gray-600">Recommended for the wearer&apos;s private audio. The iPhone speaker covers the other side.</p>
           </div>
           <div className="rounded-2xl border border-gray-200 p-6">
             <h3 className="font-semibold">Will it work at the clinic or a shop?</h3>
@@ -288,7 +288,7 @@ export default function Home() {
         <div className="mx-auto max-w-7xl px-4 py-16">
           <div className="grid gap-8 md:grid-cols-3">
             <div className="md:col-span-2">
-              <h2 className="text-3xl font-bold">Why we're building ReMic</h2>
+              <h2 className="text-3xl font-bold">Why we&apos;re building ReMic</h2>
               <p className="mt-3 text-gray-600">My mom loves making friends in the U.S., but English is hard. Phone translators are clunky—you lose the moment. ReMic gives the moment back.</p>
               <div className="mt-6 flex gap-3">
                 <a href="#" className="inline-flex items-center rounded-lg bg-gray-900 px-5 py-3 text-white font-medium hover:bg-gray-800">Get TestFlight</a>
@@ -296,7 +296,7 @@ export default function Home() {
               </div>
             </div>
             <div className="rounded-2xl border border-gray-200 bg-white p-6">
-              <p className="text-sm text-gray-600">"This lets my mom chat with any neighbor, cashier, or doctor—without friction. If it works for her, it'll work for millions."</p>
+              <p className="text-sm text-gray-600">&ldquo;This lets my mom chat with any neighbor, cashier, or doctor—without friction. If it works for her, it&apos;ll work for millions.&rdquo;</p>
               <div className="mt-4 flex items-center gap-3">
                 <img src="https://dummyimage.com/48x48/ddd/fff&text=H" className="h-12 w-12 rounded-full" alt="Huan" />
                 <div>

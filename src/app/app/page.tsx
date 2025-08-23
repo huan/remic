@@ -20,7 +20,7 @@ export default function App() {
         {/* Testimonial */}
         <div className="mb-32">
           <p className="text-white/80 text-2xl px-8 md:text-2xl italic font-light leading-8">
-            "Thanks to ReMic, my Chinese mom can now make new friends in the US without needing to learn English."
+            &ldquo;Thanks to ReMic, my Chinese mom can now make new friends in the US without needing to learn English.&rdquo;
           </p>
         </div>
 
