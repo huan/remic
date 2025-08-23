@@ -48,12 +48,14 @@ export default function Home() {
           
           {/* Join Conversation Link */}
           <div className="text-center">
-            <Button 
-              variant="link" 
-              className="text-white/50 hover:text-gray-600 font-light p-0 h-auto text-lg"
-            >
-              Join Conversation
-            </Button>
+            <Link href="/join-conversation">
+              <Button 
+                variant="link" 
+                className="text-white/50 hover:text-gray-600 font-light p-0 h-auto text-lg"
+              >
+                Join Conversation
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
