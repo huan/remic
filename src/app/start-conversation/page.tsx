@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button"
-import Link from "next/link"
 
 export default function Home() {
   return (
@@ -28,31 +27,28 @@ export default function Home() {
       {/* Content */}
       <div className="relative z-30 flex flex-col items-center justify-center text-center max-w-md mx-auto">
         {/* Testimonial */}
-        <div className="mb-32">
-          <p className="text-white/80 text-2xl px-8 md:text-2xl italic font-light leading-8">
-            "Thanks to ReMic, my Chinese mom can now make new friends in the US without needing to learn English."
+        <div className="mb-24">
+          <p className="text-white/80 text-2xl px-8 md:text-2xl font-light leading-8">
+            Show this QR code to the person you want to talk to.
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-5 mb-56">
+        <div className="space-y-5 mb-40">
           {/* Start Conversation Button */}
-          <Link href="/start-conversation" className="w-full">
-            <Button 
-              size="lg" 
-              className="w-full h-14 text-2xl font-normal px-6 py-8 bg-gradient-to-t from-[#D3D3D3] to-[#FFF] hover:bg-white text-gray-800 hover:text-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-            >
-              Start Conversation
-            </Button>
-          </Link>
-          
-          {/* Join Conversation Link */}
+          <Button 
+            size="lg" 
+            className="w-full h-64 text-2xl font-normal px-6 py-8 bg-white hover:bg-white text-gray-800 hover:text-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+          >
+            <img src="/qr.png" alt="QR Code" width={200} height={200} />
+          </Button>
+
           <div className="text-center">
             <Button 
               variant="link" 
               className="text-white/50 hover:text-gray-600 font-light p-0 h-auto text-lg"
             >
-              Join Conversation
+              Click to copy
             </Button>
           </div>
         </div>
