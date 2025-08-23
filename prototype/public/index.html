@@ -1,0 +1,347 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReMic — Audio-only WebRTC (TURN-ready)</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <main>
+    <h1>ReMic — Audio-only WebRTC</h1>
+    <section class="controls">
+      <label>Room <input id="room" placeholder="e.g. remic-voice-001"></label>
+      <button id="join">Join</button>
+      <button id="start" disabled>Start Call</button>
+      <button id="hangup" disabled>Hang Up</button>
+      <p id="status">Status: idle</p>
+      <div class="ai-controls">
+        <label><input type="checkbox" id="toggleInterpret" checked> Interpretation</label>
+        <label><input type="checkbox" id="toggleMonitor"> Monitor AI Audio</label>
+        <span id="aiState" style="margin-left:8px;font-size:0.9em;opacity:0.8;">AI: idle</span>
+      </div>
+    </section>
+
+    <section class="audio">
+      <div>
+        <h3>Local Mic</h3>
+        <audio id="local" autoplay muted></audio>
+      </div>
+      <div>
+        <h3>Remote Audio</h3>
+        <audio id="remote" autoplay></audio>
+      </div>
+      <div style="display:none" id="aiMonitorWrap">
+        <h3>AI Output</h3>
+        <audio id="aiMonitor" autoplay></audio>
+      </div>
+    </section>
+
+    <section class="notes">
+      <ul>
+        <li>Audio-only, mono Opus, low bitrate, ptime=10, DTX on.</li>
+        <li>Includes TURN placeholders (UDP preferred).</li>
+      </ul>
+    </section>
+  </main>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const roomEl = $('room'), joinBtn = $('join'), startBtn = $('start'), hangupBtn = $('hangup');
+  const statusEl = $('status'), localEl = $('local'), remoteEl = $('remote');
+  const interpretChk = $('toggleInterpret'), monitorChk = $('toggleMonitor');
+  const aiStateEl = $('aiState'), aiMonitorEl = $('aiMonitor'), aiMonitorWrap = $('aiMonitorWrap');
+
+    const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+    const wsURL = `${proto}://${location.host}`;
+    let ws, room;
+
+    function setStatus(s) { statusEl.textContent = 'Status: ' + s; console.log('[status]', s); }
+    function setAIState(s) { aiStateEl.textContent = 'AI: ' + s; console.log('[ai]', s); }
+
+    // Simple toast system
+    let toastTimer;
+    function showToast(msg, type='info') {
+      let el = document.getElementById('toast');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = 'toast';
+        Object.assign(el.style, { position:'fixed', bottom:'12px', right:'12px', background:'#222', color:'#fff', padding:'8px 12px', borderRadius:'6px', fontSize:'14px', maxWidth:'260px', zIndex:9999, boxShadow:'0 2px 8px rgba(0,0,0,0.3)', transition:'opacity .3s' });
+        document.body.appendChild(el);
+      }
+      el.style.opacity = 1;
+      el.style.background = type==='error' ? '#b3261e' : (type==='warn' ? '#b26f1e' : '#222');
+      el.textContent = msg;
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(()=>{ el.style.opacity = 0; }, 4000);
+    }
+
+    function send(type, data) { ws?.send(JSON.stringify({ type, ...(data||{}) })); }
+
+    async function connectWS() {
+      if (ws && ws.readyState === WebSocket.OPEN) return;
+      ws = new WebSocket(wsURL);
+      await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });
+      ws.onmessage = async (ev) => {
+        const m = JSON.parse(ev.data);
+        if (m.type === 'joined') { setStatus('joined room'); startBtn.disabled = false; }
+        else if (m.type === 'peer-joined') { setStatus('peer joined'); }
+        else if (m.type === 'peer-left') { setStatus('peer left'); endCall(); }
+        else if (m.type === 'signal') { await handleSignal(m.data); }
+      };
+    }
+
+    // --- ICE / TURN config ---
+    const iceServers = [
+      { urls: ['stun:stun.l.google.com:19302'] },
+      // Fill these with your TURN server(s):
+      // { urls: 'turn:your.turn.host:3478?transport=udp', username: 'USER', credential: 'PASS' },
+      // { urls: 'turn:your.turn.host:3478?transport=tcp', username: 'USER', credential: 'PASS' },
+      // { urls: 'turns:your.turn.host:5349', username: 'USER', credential: 'PASS' },
+    ];
+
+  let pc, localStream, remoteStream;
+  // AI session related
+  let aiPc = null;               // PeerConnection to OpenAI
+  let aiSessionPromise;          // Promise for session setup
+  let aiActive = false;          // Whether AI audio has replaced mic upstream
+  let originalTrack = null;      // Raw mic track we started with
+  let currentSender = null;      // RTCRtpSender for outbound track to peer
+  let aiReturnedTrack = null;    // The AI interpreted audio track
+
+    function ensurePC() {
+      if (pc) return pc;
+      pc = new RTCPeerConnection({ iceServers });
+      pc.onicecandidate = (e) => { if (e.candidate) send('signal', { data: { candidate: e.candidate } }); };
+      pc.onconnectionstatechange = () => setStatus('pc: ' + pc.connectionState);
+      pc.ontrack = (e) => {
+        if (!remoteStream) remoteStream = new MediaStream();
+        e.streams[0].getAudioTracks().forEach(t => remoteStream.addTrack(t));
+        remoteEl.srcObject = remoteStream;
+      };
+      return pc;
+    }
+
+    async function getMic() {
+      if (localStream) return localStream;
+      localStream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          channelCount: 1,
+          sampleRate: 48000,
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true
+        },
+        video: false
+      });
+      localEl.srcObject = localStream;
+      return localStream;
+    }
+
+    function tuneOpusSdp(sdp) {
+      // Prefer Opus and set params: mono, low bitrate, ptime=10, DTX, FEC.
+      sdp = sdp.replace(/a=fmtp:(\d+) (.*)\r\n/g, (m, pt, params) => m); // keep others
+      // Force default codec order to Opus first
+      sdp = sdp.replace(/m=audio \d+ UDP\/TLS\/RTP\/SAVPF ([0-9 ]+)\r\n/, (m, caps) => {
+        const list = caps.trim().split(' ');
+        // Find opus (usually 111)
+        const opusPT = list.find(pt => new RegExp(`a=rtpmap:${pt} opus\\/48000\\/2`).test(sdp) || new RegExp(`a=rtpmap:${pt} opus\\/48000\\/1`).test(sdp));
+        if (!opusPT) return m;
+        const reordered = [opusPT, ...list.filter(x => x !== opusPT)].join(' ');
+        return m.replace(caps, reordered);
+      });
+      // Add fmtp for opus payloads
+      sdp = sdp.replace(/a=rtpmap:(\d+) opus\/48000\/(\d+)\r\n/g, (m, pt, ch) => {
+        const fmtp = [
+          `a=fmtp:${pt} stereo=0`,
+          `sprop-stereo=0`,
+          `maxaveragebitrate=24000`,
+          `ptime=10`,
+          `useinbandfec=1`,
+          `usedtx=1`
+        ].join(';');
+        return `${m}${fmtp}\r\n`;
+      });
+      return sdp;
+    }
+
+    async function startCall() {
+      await getMic();
+      const pc = ensurePC();
+      // Add original mic track immediately for negotiation; will be replaced later when AI audio arrives.
+      const micTracks = localStream.getAudioTracks();
+      originalTrack = micTracks[0];
+      currentSender = pc.addTrack(originalTrack, localStream);
+      if (interpretChk.checked) {
+        // Start AI asynchronously
+        initializeRealtimeConversion().catch(err => {
+          showToast('Interpretation failed (fallback mic)', 'warn');
+          setAIState('failed');
+        });
+      } else {
+        setAIState('disabled');
+      }
+
+      const offer = await pc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: false });
+      await pc.setLocalDescription(offer);
+      pc.localDescription.sdp = tuneOpusSdp(pc.localDescription.sdp);
+      // Re-apply tuned SDP
+      await pc.setLocalDescription(pc.localDescription);
+      send('signal', { data: { sdp: pc.localDescription } });
+      startBtn.disabled = true; hangupBtn.disabled = false;
+      setStatus('offer sent');
+    }
+
+    async function handleSignal(obj) {
+      const pc = ensurePC();
+      if (obj.sdp) {
+        const desc = obj.sdp;
+        if (desc.type === 'offer') {
+          await getMic();
+          const micTracks = localStream.getAudioTracks();
+          originalTrack = micTracks[0];
+          currentSender = pc.addTrack(originalTrack, localStream);
+          if (interpretChk.checked) {
+            initializeRealtimeConversion().catch(err => {
+              showToast('Interpretation failed (answerer fallback)', 'warn');
+              setAIState('failed');
+            });
+          } else {
+            setAIState('disabled');
+          }
+          await pc.setRemoteDescription(desc);
+          let answer = await pc.createAnswer();
+          answer.sdp = tuneOpusSdp(answer.sdp);
+          await pc.setLocalDescription(answer);
+          send('signal', { data: { sdp: pc.localDescription } });
+          hangupBtn.disabled = false;
+          setStatus('answer sent');
+        } else if (desc.type === 'answer') {
+          await pc.setRemoteDescription(desc);
+          setStatus('answer received');
+        }
+      } else if (obj.candidate) {
+        try { await pc.addIceCandidate(obj.candidate); } catch (e) { console.warn(e); }
+      }
+    }
+
+    function endCall() {
+      if (pc) { try { pc.close(); } catch {} pc = null; }
+      if (aiPc) { try { aiPc.close(); } catch {} aiPc = null; aiActive = false; aiReturnedTrack = null; aiSessionPromise = null; }
+      if (localStream) { localStream.getTracks().forEach(t => t.stop()); localStream = null; localEl.srcObject = null; }
+      if (remoteStream) { remoteStream = null; remoteEl.srcObject = null; }
+      startBtn.disabled = false; hangupBtn.disabled = true;
+      setStatus('call ended');
+      setAIState('idle');
+    }
+
+    joinBtn.onclick = async () => {
+      room = roomEl.value.trim();
+      if (!room) return alert('enter room');
+      await connectWS();
+      send('join', { room });
+    };
+    startBtn.onclick = startCall;
+    hangupBtn.onclick = () => { send('leave'); endCall(); };
+
+    // --- OpenAI Realtime conversion layer ---
+    // This function establishes a WebRTC session directly with OpenAI's Realtime API
+    // and routes the local microphone into the model, receiving synthesized / interpreted
+    // English audio back as a new MediaStream (remicStream).
+    // If anything fails it throws, and the caller should fall back to localStream.
+    async function initializeRealtimeConversion(force=false) {
+      if (!interpretChk.checked && !force) return; // disabled
+      if (aiSessionPromise) return aiSessionPromise;
+      if (!localStream || !currentSender) return;
+      setAIState('connecting');
+      aiSessionPromise = (async () => {
+        try {
+          // Fetch token
+          const tokRes = await fetch('/openai-token');
+          if (!tokRes.ok) throw new Error('ephemeral token fetch failed');
+          const { token } = await tokRes.json();
+          if (!token) throw new Error('no token');
+
+          aiPc = new RTCPeerConnection();
+          aiPc.onconnectionstatechange = () => {
+            if (aiPc.connectionState === 'failed') setAIState('failed');
+          };
+          aiPc.ontrack = (e) => {
+            const tracks = e.streams[0].getAudioTracks();
+            if (!tracks.length) return;
+            aiReturnedTrack = tracks[0];
+            if (monitorChk.checked) {
+              aiMonitorEl.srcObject = new MediaStream([aiReturnedTrack]);
+            }
+            if (interpretChk.checked && currentSender && !aiActive) {
+              currentSender.replaceTrack(aiReturnedTrack).then(()=>{
+                aiActive = true; setAIState('active'); setStatus('interpreted audio active');
+                showToast('Interpretation active');
+              }).catch(err => console.warn('replaceTrack error', err));
+            }
+          };
+          // send mic to AI
+          localStream.getAudioTracks().forEach(t => aiPc.addTrack(t, localStream));
+          const dc = aiPc.createDataChannel('oai-events');
+          dc.onopen = () => {
+            const systemPrompt = 'you are an native english simultaneous interpretation, your will interpretation as fast as possible, and rewording it in fluent english with high confidence.';
+            try { dc.send(JSON.stringify({ type: 'response.create', response: { instructions: systemPrompt } })); }
+            catch(e){ console.warn('prompt send failed', e); }
+          };
+          const offer = await aiPc.createOffer({ offerToReceiveAudio: true, offerToReceiveVideo: false });
+          await aiPc.setLocalDescription(offer);
+          const oaiRes = await fetch('https://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17', {
+            method: 'POST',
+            body: aiPc.localDescription.sdp,
+            headers: {'Authorization': 'Bearer '+token,'Content-Type': 'application/sdp'}
+          });
+          if (!oaiRes.ok) throw new Error('SDP exchange failed');
+            const answerSdp = await oaiRes.text();
+          await aiPc.setRemoteDescription({ type: 'answer', sdp: answerSdp });
+          setAIState('waiting audio');
+          setTimeout(()=>{
+            if (!aiActive) showToast('Still waiting for AI audio...', 'warn');
+          }, 5000);
+          return true;
+        } catch (e) {
+          setAIState('failed');
+          showToast('AI setup error: '+ e.message, 'error');
+          aiSessionPromise = null;
+          throw e;
+        }
+      })();
+      return aiSessionPromise;
+    }
+
+    // --- Toggle handlers ---
+    interpretChk?.addEventListener('change', () => {
+      if (!currentSender || !localStream) return;
+      if (interpretChk.checked) {
+        setAIState('enabling');
+        if (aiReturnedTrack && aiPc && aiPc.connectionState !== 'failed') {
+          currentSender.replaceTrack(aiReturnedTrack).then(()=>{ aiActive = true; setAIState('active'); showToast('Interpretation enabled'); });
+        } else {
+          initializeRealtimeConversion().catch(()=>{});
+        }
+      } else {
+        // Disable interpretation: revert to original mic
+        if (originalTrack && currentSender) {
+          currentSender.replaceTrack(originalTrack).then(()=>{
+            aiActive = false; setAIState('disabled'); showToast('Interpretation disabled');
+          });
+        }
+      }
+    });
+
+    monitorChk?.addEventListener('change', () => {
+      aiMonitorWrap.style.display = monitorChk.checked ? 'block' : 'none';
+      if (monitorChk.checked) {
+        if (aiReturnedTrack) aiMonitorEl.srcObject = new MediaStream([aiReturnedTrack]);
+      } else {
+        aiMonitorEl.srcObject = null;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -9,6 +9,16 @@ Vibe Prompting logs go here.
 
 ## 2025-08-23
 
+TODO: add an audio conversion layer between Local Mic and RTC Track. the conversion will be inserted in the startCall(), right before add localStream to pc.addTrack. we use OpenAI realtime api to convert the localStream to an new audio stream with a prompt.
+
+Here's what to do:
+
+1. add a function, to initialize OpenAI realtime API, accept localStream as input, call realtime API, get the returned stream and return it as remicStream.
+2. replace `pc.addTrack(t, localStream)`, to `pc.addTrack(t, remicStream)`, so the remote peer will received the remicStream instead of the original one.
+3. set the LLM prompt to a simple version: 'you are an native english simultaneous interpretation, your will interpretation as fast as possible, and rewording it in fluent english with high confidence.'
+
+---
+
 My reviews:
 
  (Stated goal) only Pipe remote audio to speaker (for now) / to LLM (in the future). We do not pipe  local audio to speaker/llm. 
