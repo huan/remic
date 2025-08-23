@@ -1,6 +1,72 @@
+"use client"
+
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
+import QRCode from "qrcode"
+import { useSocket } from "@/lib/socket"
 
 export default function Home() {
+  const [conversationId, setConversationId] = useState<string>("")
+  const [qrCodeUrl, setQrCodeUrl] = useState<string>("")
+  const [qrCodeDataUrl, setQrCodeDataUrl] = useState<string>("")
+  const [someoneJoining, setSomeoneJoining] = useState(false)
+  const router = useRouter()
+  const { joinRoom, onUserJoined, isConnected } = useSocket()
+
+  useEffect(() => {
+    // Generate a unique conversation ID
+    const id = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+    setConversationId(id)
+    
+    // Create the conversation URL
+    const url = `${window.location.origin}/conversation/${id}`
+    setQrCodeUrl(url)
+    
+    // Generate QR code
+    QRCode.toDataURL(url, {
+      width: 200,
+      margin: 2,
+      color: {
+        dark: '#000000',
+        light: '#FFFFFF'
+      }
+    }).then(dataUrl => {
+      setQrCodeDataUrl(dataUrl)
+    }).catch(err => {
+      console.error('Error generating QR code:', err)
+    })
+  }, [])
+
+  // Join the room and listen for other users joining
+  useEffect(() => {
+    if (isConnected && conversationId) {
+      // Join the room as the host
+      joinRoom(conversationId)
+      
+      // Set up listener for when someone else joins
+      onUserJoined((data) => {
+        if (data.room === conversationId && data.isSecondUser) {
+          // Someone else joined our room, show joining indicator and then redirect
+          setSomeoneJoining(true)
+          setTimeout(() => {
+            router.push(`/conversation/${conversationId}`)
+          }, 1000) // Small delay to let the other user get settled
+        }
+      })
+    }
+  }, [isConnected, conversationId, joinRoom, onUserJoined, router])
+
+  const copyToClipboard = async () => {
+    try {
+      await navigator.clipboard.writeText(qrCodeUrl)
+      // You could add a toast notification here
+      alert("Conversation link copied to clipboard!")
+    } catch (err) {
+      console.error('Failed to copy:', err)
+    }
+  }
+
   return (
     <main className="min-h-screen relative flex flex-col items-center justify-center p-8">
       {/* Background Image with Overlay */}
@@ -14,41 +80,51 @@ export default function Home() {
         }}
       />
       
-      {/* Gradient Overlay */}
-      {/* <div className="absolute inset-0 bg-gradient-to-b from-blue-100/80 via-blue-50/60 to-red-200/80 z-10" /> */}
-      
-      {/* Diagonal Lines Pattern */}
-      {/* <div className="absolute inset-0 z-20 opacity-20">
-        <div className="w-full h-full" style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)'
-        }} />
-      </div> */}
-
       {/* Content */}
       <div className="relative z-30 flex flex-col items-center justify-center text-center max-w-md mx-auto">
         {/* Testimonial */}
         <div className="mb-24">
-          <p className="text-white/80 text-2xl px-8 md:text-2xl font-light leading-8">
-            Show this QR code to the person you want to talk to.
-          </p>
+          {someoneJoining ? (
+            <div className="flex flex-col items-center space-y-4">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white"></div>
+              <p className="text-white/80 text-2xl px-8 md:text-2xl font-light leading-8">
+                Someone joined! Starting conversation...
+              </p>
+            </div>
+          ) : (
+            <p className="text-white/80 text-2xl px-8 md:text-2xl font-light leading-8">
+              Show this QR code to the person you want to talk to.
+            </p>
+          )}
         </div>
 
-        {/* Action Buttons */}
+        {/* QR Code Display */}
         <div className="space-y-5 mb-40">
-          {/* Start Conversation Button */}
-          <Button 
-            size="lg" 
-            className="w-full h-64 text-2xl font-normal px-6 py-8 bg-white hover:bg-white text-gray-800 hover:text-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
-          >
-            <img src="/qr.png" alt="QR Code" width={200} height={200} />
-          </Button>
+          <div className="w-64 h-64 bg-white rounded-2xl shadow-lg p-4 mx-auto flex items-center justify-center">
+            {qrCodeDataUrl ? (
+              <img 
+                src={qrCodeDataUrl} 
+                alt="QR Code" 
+                className="w-full h-full object-contain"
+              />
+            ) : (
+              <div className="flex items-center justify-center">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+              </div>
+            )}
+          </div>
 
-          <div className="text-center">
+          <div className="text-center space-y-2">
+            <p className="text-white/60 text-sm">Conversation ID:</p>
+            <p className="text-white font-mono text-sm bg-white/20 px-3 py-2 rounded-lg break-all">
+              {conversationId}
+            </p>
             <Button 
+              onClick={copyToClipboard}
               variant="link" 
-              className="text-white/50 hover:text-gray-600 font-light p-0 h-auto text-lg"
+              className="text-white/50 hover:text-white font-light p-0 h-auto text-lg"
             >
-              Click to copy
+              Click to copy conversation link
             </Button>
           </div>
         </div>

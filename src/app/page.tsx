@@ -15,48 +15,46 @@ export default function Home() {
         }}
       />
       
-      {/* Gradient Overlay */}
-      {/* <div className="absolute inset-0 bg-gradient-to-b from-blue-100/80 via-blue-50/60 to-red-200/80 z-10" /> */}
-      
-      {/* Diagonal Lines Pattern */}
-      {/* <div className="absolute inset-0 z-20 opacity-20">
-        <div className="w-full h-full" style={{
-          backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.1) 10px, rgba(255,255,255,0.1) 20px)'
-        }} />
-      </div> */}
-
       {/* Content */}
       <div className="relative z-30 flex flex-col items-center justify-center text-center max-w-md mx-auto">
-        {/* Testimonial */}
-        <div className="mb-32">
-          <p className="text-white/80 text-2xl px-8 md:text-2xl italic font-light leading-8">
-            "Thanks to ReMic, my Chinese mom can now make new friends in the US without needing to learn English."
+        {/* Header */}
+        <div className="mb-16">
+          <h1 className="text-white text-5xl font-bold mb-6">Remic</h1>
+          <p className="text-white/80 text-xl font-light">
+            Connect with people and exchange languages
           </p>
         </div>
 
         {/* Action Buttons */}
-        <div className="space-y-5 mb-56">
+        <div className="space-y-6 w-full max-w-sm">
           {/* Start Conversation Button */}
-          <Link href="/start-conversation" className="w-full">
+          <Link href="/start-conversation" className="block">
             <Button 
               size="lg" 
-              className="w-full h-14 text-2xl font-normal px-6 py-8 bg-gradient-to-t from-[#D3D3D3] to-[#FFF] hover:bg-white text-gray-800 hover:text-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full h-16 text-xl font-medium bg-white hover:bg-white text-gray-800 hover:text-gray-900 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
             >
               Start Conversation
             </Button>
           </Link>
-          
-          {/* Join Conversation Link */}
-          <div className="text-center">
-            <Link href="/join-conversation">
-              <Button 
-                variant="link" 
-                className="text-white/50 hover:text-gray-600 font-light p-0 h-auto text-lg"
-              >
-                Join Conversation
-              </Button>
-            </Link>
-          </div>
+
+          {/* Join Conversation Button */}
+          <Link href="/join-conversation" className="block">
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="w-full h-16 text-xl font-medium border-2 border-white/30 text-white hover:bg-white hover:text-gray-800 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+            >
+              Join Conversation
+            </Button>
+          </Link>
+        </div>
+
+        {/* Description */}
+        <div className="mt-16 text-center">
+          <p className="text-white/60 text-lg leading-relaxed">
+            Create a conversation and share the QR code, or scan someone else's QR code to join their conversation. 
+            Choose your language and see what language the other person speaks.
+          </p>
         </div>
       </div>
 
