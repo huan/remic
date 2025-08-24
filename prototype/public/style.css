@@ -14,3 +14,25 @@ button[disabled]{ opacity:.5; cursor:not-allowed; }
 audio { width:100%; outline:none; background:#000; border-radius:8px; border:1px solid var(--border); }
 .notes ul { margin: 0; padding-left: 18px; color: var(--muted); }
 #status { margin-top: 8px; color: var(--muted); }
+
+/* --- New auto-flow UI additions --- */
+.overlay {
+       position: fixed; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center;
+       background: radial-gradient(circle at 30% 30%, #112033, #050910 70%); padding:32px; gap:32px; z-index: 50;
+}
+.lang-select h2 { margin:0 0 8px; font-size: 28px; text-align:center; }
+.lang-buttons { display:flex; gap:24px; flex-wrap:wrap; justify-content:center; }
+.lang-buttons button { font-size:24px; padding:28px 40px; min-width:240px; border-radius:20px; box-shadow:0 4px 18px -4px rgba(0,0,0,.5); }
+.qr-stage { text-align:center; }
+#qr { margin:24px auto; width:260px; height:260px; background:#fff; display:flex; align-items:center; justify-content:center; border-radius:16px; }
+.qr-meta { font-size:14px; color:var(--muted); margin-top:8px; }
+.scan-link { margin-top:12px; display:inline-block; font-size:15px; cursor:pointer; color:var(--accent); text-decoration:none; }
+.scan-view { display:none; flex-direction:column; align-items:center; gap:16px; }
+.scan-view.active { display:flex; }
+video.scan { width:320px; max-width:80vw; border:2px solid var(--accent); border-radius:12px; background:#000; }
+.small-note { font-size:12px; opacity:.6; }
+.hidden { display:none !important; }
+
+/* Hide legacy manual controls in new flow (keep for fallback) */
+body.auto-flow .controls { display:none; }
+

@@ -9,6 +9,21 @@ Vibe Prompting logs go here.
 
 ## 2025-08-23
 
+focus on prototype/ folder, let's enhance it, to support:
+
+Let's define two user as A and B.
+
+1. when any user open the page, page provides two button for users to choose language from Chinese and English. Buttons should be big, with a brief explaination: Pick your language.
+2. after users select their language, page generate a random id as WebRTC room id, then shows a QR code of a link to server with the id as parameter. at the same time, the page start maintaining a web socket connect to the server, to subscript the event for any one visiting this room id: if there's any, the page will join this room id and start call automatically.
+3. under QR code, there is a link shows "Scan Other's" , if user click this link, user become user B journey, it will open the camera and recognize qrcode, then jump to the link in the qr code.
+4. when user B visit the qr code link, the linked page  should use the room id as the webrtc room id, then join the room and start call immediately, so that it can let user B connect to the user A via WebRTC
+
+In short, let's replace the manual input id, manual join, manual start call process, to a fully automatical process, by using qr code to show the room id, by scaning qr code to get the room id, by using websocket to monitor if there any qrcode link has been visited so that both user can start call together.
+
+ask me questions if you need to clarify anything, then implement this requirement.
+
+---
+
 TODO: add an audio conversion layer between Local Mic and RTC Track. the conversion will be inserted in the startCall(), right before add localStream to pc.addTrack. we use OpenAI realtime api to convert the localStream to an new audio stream with a prompt.
 
 Here's what to do:
