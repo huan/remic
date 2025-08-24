@@ -134,11 +134,17 @@ Design goals: **fast, legible, low cognitive load, finger‑friendly**.
 
 ## 🙋 Team
 
-![ReMic Team Members](remic-team.jpg)
-
 - **Lead:** Huan Li (@huan) – Builder, coder, founder
 - **Designer & Frontend:** Oliver Cingl - Founder, hacker, builder
 - **Open roles:** 1 × Designer (UI/UX polish), optional 1 × Audio/WebRTC wrangler  
+
+### From
+
+![ReMic Team Members at opening](docs/remic-open.jpg)
+
+### To
+
+![ReMic Team Members at closing](docs/remic-close.jpg)
 
 ---
 
