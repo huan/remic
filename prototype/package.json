@@ -8,7 +8,9 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "dotenv": "^17.2.1",
     "express": "^4.19.2",
+    "qrcode": "^1.5.3",
     "ws": "^8.18.0"
   }
 }

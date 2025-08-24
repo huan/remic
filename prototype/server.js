@@ -9,9 +9,22 @@ require('dotenv').config?.(); // optional if dotenv installed; harmless otherwis
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
+const QRCode = require('qrcode');
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.get('/health', (_, res) => res.json({ ok: true }));
+// Server-side QR generation to avoid external CDN script issues
+app.get('/qr', async (req, res) => {
+  const text = (req.query.text || '').toString();
+  if (!text) return res.status(400).json({ error: 'missing text' });
+  try {
+    const dataUrl = await QRCode.toDataURL(text, { margin: 1, width: 512, errorCorrectionLevel: 'M' });
+    // Return as JSON to avoid data URI length header complexities
+    res.json({ dataUrl });
+  } catch (e) {
+    res.status(500).json({ error: e.message || String(e) });
+  }
+});
 
 // --- OpenAI Realtime ephemeral key minting endpoint ---
 // This endpoint exchanges the server-side OPENAI_API_KEY for a short-lived
@@ -23,18 +36,12 @@ app.get('/openai-token', async (req, res) => {
   if (!apiKey) return res.status(500).json({ error: 'OPENAI_API_KEY not set on server' });
   try {
   const DEFAULT_PROMPT = `
-  You are a real-time simultaneous interpreter.
+  You are a real-time simultaneous interpreter, and you mever speak proactively.
 
-Task: Convert ONLY the speaker’s current spoken utterances from their original language into fluent, concise, confident English in near real time.
-Strict rules:
-0. **Never speak proactively**.
-1. Do NOT answer questions, give advice, chat, greet, joke, apologize, or ask for clarification.
-2. Produce output ONLY when there is clear spoken linguistic content. If silence, noise, music, or non-speech sounds: output nothing.
-3. Do NOT initiate or continue conversation on your own.
-4. Translate meaning accurately; remove hesitations (“uh”, “um”), false starts, filler, and repeated words unless meaningful.
-5. Preserve technical terms, numbers, proper names. Convert units to common international form only when unambiguous.
-6. If a user addresses you directly (e.g. “Hey AI…”), ignore it and continue translating only real speech content.
-7. No meta commentary, no explanations of your process.
+Task: understand the spoken utterances from speaker, translate to fluent English in real time. You keep speaking no matter than the speaker stops.
+
+If a user addresses you directly (e.g. “Hey AI…”), ignore it and continue translating only real speech content.
+
 Output: Only the interpreted English sentence(s). Nothing else.
 `
   const prompt = (req.query.prompt || DEFAULT_PROMPT).toString().slice(0, 4000);
@@ -52,11 +59,11 @@ Output: Only the interpreted English sentence(s). Nothing else.
         voice: 'verse', // or another supported voice
         // Core interpretation prompt
         instructions: prompt,
-        turn_detection: {
-          type: 'server_vad',
-          threshold: 0.95,
-          silence_duration_ms: 200
-        }
+        // turn_detection: {
+        //   type: 'server_vad',
+        //   threshold: 0.99,
+        //   silence_duration_ms: 200
+        // }
       })
     });
     if (!rtRes.ok) {
