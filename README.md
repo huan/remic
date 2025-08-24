@@ -8,7 +8,7 @@ Hi, I’m Huan. My mom loves making friends in the U.S., but she doesn’t speak
 This is ReMic. One toggle, one button. Two people speak their own languages; each hears the other in near real time—natural, styled, fluent.
 It’s powered by realtime multimodal LLM streaming with a twist: **style filters** that adapt tone (*YC Pitch*, *Neutral Pro*, *Warm & Slow*).
 Live demo: Person A speaks English → Person B’s phone / earbuds whisper Mandarin. Person B replies in Mandarin → Person A hears styled English. No phone hand‑offs.
-We **pivoted during the hackathon** from a native Swift iOS prototype to a **pure Web PWA at https://remic.app** so anyone can install it instantly (Add to Home Screen) and pair via QR code.
+We **pivoted during the hackathon** from a native Swift iOS prototype to a **pure Web PWA at https://remic.vercel.app** so anyone can install it instantly (Add to Home Screen) and pair via QR code.
 We built low-latency streaming, bilingual routing logic, session pairing (QR), transcripts, and style presets—within 24 hours.
 Who’s it for? Immigrants, clinics, schools, local businesses.
 Why now? Realtime multimodal models + WebRTC/WebAudio now make sub‑2s bilingual turns achievable in the browser.
