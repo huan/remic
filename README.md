@@ -140,11 +140,11 @@ Design goals: **fast, legible, low cognitive load, finger‑friendly**.
 
 ### From
 
-![ReMic Team Members at opening](docs/remic-open.jpg)
+![ReMic Team Members at opening](docs/images/remic-open.jpg)
 
 ### To
 
-![ReMic Team Members at closing](docs/remic-close.jpg)
+![ReMic Team Members at closing](docs/images/remic-close.jpg)
 
 ---
 
