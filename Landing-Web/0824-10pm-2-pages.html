@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReMic — where your voice never waits for translation</title>
+  <meta name="description" content="ReMic is your always-on AI interpreter: true simultaneous interpretation (SI) for natural, uninterrupted conversations across languages." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="icon" href="/favicon.ico" />
+  <!-- Open Graph / Twitter -->
+  <meta property="og:title" content="ReMic — where your voice never waits for translation" />
+  <meta property="og:description" content="True simultaneous interpretation. Talk naturally. ReMic streams your words across languages in real time." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="/og-remic.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['ui-sans-serif','system-ui','-apple-system','Segoe UI','Roboto','Inter','sans-serif'] },
+          colors: { brand: { 50:'#ecfeff',100:'#cffafe',200:'#a5f3fc',300:'#67e8f9',400:'#22d3ee',500:'#06b6d4',600:'#0891b2',700:'#0e7490',800:'#155e75',900:'#164e63' } }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* subtle grain for depth */
+    .grain:before{content:"";position:absolute;inset:-50%;background-image:url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" opacity="0.05"><filter id="n"><feTurbulence baseFrequency="0.7" numOctaves="3" seed="2"/></filter><rect width="100%" height="100%" filter="url(%23n)"/></svg>');mix-blend-mode:multiply;pointer-events:none}
+  </style>
+</head>
+<body class="bg-gray-950 text-white selection:bg-brand-300/30 selection:text-white antialiased">
+
+  <!-- Nav (minimal, sticky when scroll) -->
+  <header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-gray-950/60">
+    <div class="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 font-semibold">
+        <svg width="28" height="28" viewBox="0 0 24 24" class="text-brand-300"><path fill="currentColor" d="M3 5h5l2 3h6l5 5-4 4h-6l-2-3H3z"/></svg>
+        <span>ReMic</span>
+      </a>
+      <a href="#waitlist" class="inline-flex items-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-400 transition px-4 py-2 text-sm font-semibold">
+        Join waitlist
+        <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M5 12h12l-5-5l1.4-1.4L21.8 14l-8.4 8.4L12 21l5-5H5z"/></svg>
+      </a>
+    </div>
+  </header>
+
+  <!-- HERO (≈1 screen) -->
+  <section class="relative min-h-[92vh] overflow-hidden">
+    <!-- Background -->
+    <div class="absolute inset-0 -z-10 grain">
+      <div class="absolute -top-40 -right-40 h-96 w-96 rounded-full bg-brand-500/20 blur-3xl"></div>
+      <div class="absolute -bottom-40 -left-40 h-[28rem] w-[28rem] rounded-full bg-sky-400/10 blur-3xl"></div>
+      <img src="/hero-bg.jpg" alt="" class="absolute inset-0 h-full w-full object-cover opacity-10" />
+    </div>
+
+    <div class="mx-auto max-w-6xl px-4 pt-20 pb-10 md:pt-24">
+      <!-- Tagline -->
+      <h1 class="text-4xl md:text-6xl font-extrabold leading-tight">
+        ReMic: <span class="text-brand-300">where your voice never waits for translation.</span>
+      </h1>
+
+      <!-- One-liner -->
+      <p class="mt-5 text-lg md:text-xl text-gray-200 max-w-3xl">
+        Forget turn-taking translators — ReMic is your always-on AI interpreter, streaming your words across languages in real time.
+      </p>
+
+      <!-- 30s pitch (shortened) -->
+      <p class="mt-4 text-base md:text-lg text-gray-300 max-w-2xl italic">
+        “Imagine chatting with anyone abroad — no awkward pauses, no waiting for apps. You both just talk. As you speak, it’s instantly translated and spoken back — like magic subtitles for real life.”
+      </p>
+
+      <!-- Primary CTA: Waitlist -->
+      <form id="waitlist" class="mt-8 grid gap-3 sm:grid-cols-[1fr_auto] max-w-xl" aria-labelledby="waitlist-label">
+        <label id="waitlist-label" class="sr-only">Join the ReMic waitlist</label>
+        <input type="email" name="email" required placeholder="you@company.com"
+               class="w-full rounded-xl bg-white/5 ring-1 ring-white/10 focus:ring-2 focus:ring-brand-400 px-4 py-3 placeholder:text-gray-400 outline-none"
+               aria-label="Email address" />
+        <button type="submit"
+                class="inline-flex justify-center items-center gap-2 rounded-xl bg-brand-500 hover:bg-brand-400 px-5 py-3 font-semibold disabled:opacity-60 disabled:cursor-not-allowed"
+                aria-live="polite">
+          <span>Join waitlist</span>
+          <svg class="animate-pulse" width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="m12 4l6 6h-4v10H10V10H6z"/></svg>
+        </button>
+        <p id="waitlist-hint" class="sm:col-span-2 text-sm text-gray-400">
+          Early access. Short updates only. Unsubscribe anytime.
+        </p>
+      </form>
+
+      <!-- Social proof / badges (HN / PH minded) -->
+      <div class="mt-8 flex flex-wrap items-center gap-4 text-gray-400">
+        <div class="inline-flex items-center gap-2 text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h18v18H3z"/></svg>
+          <span>Built by OSS maintainers (22k★)</span>
+        </div>
+        <div class="inline-flex items-center gap-2 text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c5.5 0 10 4.5 10 10S17.5 22 12 22 2 17.5 2 12 6.5 2 12 2z"/></svg>
+          <span>Launching on Product Hunt</span>
+        </div>
+        <div class="inline-flex items-center gap-2 text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="M2 21h20L12 2z"/></svg>
+          <span>Show HN soon</span>
+        </div>
+      </div>
+
+      <!-- Demo teaser (kept tiny to stay “1.5 pages”) -->
+      <div class="mt-10">
+        <video class="w-full max-w-2xl rounded-2xl ring-1 ring-white/10 shadow-2xl" autoplay muted loop playsinline>
+          <source src="/remic-hero-demo.mp4" type="video/mp4" />
+        </video>
+        <p class="mt-2 text-xs text-gray-500">Simultaneous interpretation demo (autoplay, muted)</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SECOND HALF PAGE ( concise value → how it works → CTA ) -->
+  <section id="value" class="relative border-t border-white/10">
+    <div class="mx-auto max-w-6xl px-4 py-16 md:py-20">
+      <!-- Value props (HN/Product Hunt concise bullets) -->
+      <div class="grid md:grid-cols-3 gap-6 md:gap-8">
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
+          <h3 class="font-semibold text-lg">True Simultaneous Interpretation</h3>
+          <p class="mt-2 text-gray-300 text-sm">Continuous speech in, continuous speech out. No turn-taking, no barge-in — conversations feel human.</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
+          <h3 class="font-semibold text-lg">Beauty-filter rewrite</h3>
+          <p class="mt-2 text-gray-300 text-sm">An in-loop LLM lightly rewrites translations to your tone — clear, warm, and concise without changing meaning.</p>
+        </div>
+        <div class="rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
+          <h3 class="font-semibold text-lg">Low-latency streaming</h3>
+          <p class="mt-2 text-gray-300 text-sm">ASR → MT → LLM → TTS run as overlapping streams. Target ~0.7–1.2 s clause delay for a human SI feel.</p>
+        </div>
+      </div>
+
+      <!-- How it works (minimalist pipeline) -->
+      <div class="mt-10 rounded-2xl bg-white/5 ring-1 ring-white/10 p-6">
+        <h3 class="font-semibold text-lg">How ReMic works</h3>
+        <ol class="mt-4 grid md:grid-cols-4 gap-4 text-sm">
+          <li class="rounded-xl bg-black/20 p-4">
+            <p class="text-brand-300 font-semibold">1. Listen</p>
+            <p class="mt-1 text-gray-300">Streaming ASR captures speech with interim & final text.</p>
+          </li>
+          <li class="rounded-xl bg-black/20 p-4">
+            <p class="text-brand-300 font-semibold">2. Translate</p>
+            <p class="mt-1 text-gray-300">Speech-translation (or text MT) streams target-language text.</p>
+          </li>
+          <li class="rounded-xl bg-black/20 p-4">
+            <p class="text-brand-300 font-semibold">3. Beautify</p>
+            <p class="mt-1 text-gray-300">LLM rewrites tone & clarity without altering facts.</p>
+          </li>
+          <li class="rounded-xl bg-black/20 p-4">
+            <p class="text-brand-300 font-semibold">4. Speak</p>
+            <p class="mt-1 text-gray-300">Low-latency TTS voices stream audio continuously.</p>
+          </li>
+        </ol>
+      </div>
+
+      <!-- Final CTA block (restate value + form) -->
+      <div id="join" class="mt-10 rounded-2xl bg-gradient-to-tr from-brand-600/30 to-sky-500/20 ring-1 ring-white/10 p-6 md:p-8">
+        <div class="md:flex md:items-center md:justify-between gap-6">
+          <div class="max-w-xl">
+            <h3 class="text-2xl font-extrabold">Be first to talk without borders.</h3>
+            <p class="mt-2 text-gray-200 text-sm">
+              Join the waitlist for early access and launch-day updates. One click to leave anytime.
+            </p>
+          </div>
+          <form id="waitlist-bottom" class="mt-4 md:mt-0 grid gap-3 md:grid-cols-[1fr_auto] min-w-[320px]">
+            <label class="sr-only" for="email2">Email</label>
+            <input id="email2" type="email" name="email" required placeholder="you@company.com"
+                   class="w-full rounded-xl bg-white/10 ring-1 ring-white/10 focus:ring-2 focus:ring-brand-300 px-4 py-3 placeholder:text-gray-300 outline-none" />
+            <button type="submit"
+                    class="inline-flex justify-center items-center gap-2 rounded-xl bg-white text-gray-900 hover:bg-white/90 px-5 py-3 font-semibold disabled:opacity-60 disabled:cursor-not-allowed">
+              Join waitlist
+              <svg width="16" height="16" viewBox="0 0 24 24"><path fill="currentColor" d="m12 4l6 6h-4v10H10V10H6z"/></svg>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer (compact) -->
+  <footer class="border-t border-white/10">
+    <div class="mx-auto max-w-6xl px-4 py-8 text-xs text-gray-400 flex items-center justify-between">
+      <p>© <span id="y"></span> ReMic, Inc.</p>
+      <div class="flex items-center gap-4">
+        <a class="hover:text-white" href="#value">How it works</a>
+        <a class="hover:text-white" href="#waitlist">Join waitlist</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Minimal behavior: fake submit + success state. Replace with your API later. -->
+  <script>
+    const year = document.getElementById('y'); if (year) year.textContent = new Date().getFullYear();
+    function wireForm(formId) {
+      const form = document.getElementById(formId);
+      if (!form) return;
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        const email = form.querySelector('input[type="email"]')?.value?.trim();
+        if (!email) return;
+        btn.disabled = true; btn.setAttribute('aria-busy','true');
+
+        // TODO: Replace this with your real endpoint (e.g., /api/waitlist or Formspree)
+        await new Promise(r => setTimeout(r, 700)); // simulate network
+
+        form.innerHTML = `
+          <div class="inline-flex items-center gap-2 text-sm">
+            <svg width="18" height="18" viewBox="0 0 24 24" class="text-brand-300">
+              <path fill="currentColor" d="M9 16.2 4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4z"/>
+            </svg>
+            <span>You're on the list. We'll email <strong>${email.replace(/</g,'&lt;')}</strong> soon.</span>
+          </div>
+        `;
+      });
+    }
+    wireForm('waitlist');
+    wireForm('waitlist-bottom');
+  </script>
+</body>
+</html>

@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ReMic — where your voice never waits for translation</title>
+  <meta name="description" content="ReMic is your always‑on AI interpreter: true simultaneous interpretation on your phone. Join the waitlist." />
+  <meta name="theme-color" content="#0ea5e9" />
+  <link rel="icon" href="/favicon.ico" />
+
+  <!-- Tailwind & Flowbite (Marketing UI relies on these) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.css" />
+  <script>
+    // Tailwind minimal tweaks while staying within default palette
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui', 'sans-serif'] } } } };
+  </script>
+  <style>
+    /* Keep it minimalist; 1.5-page target = limited sections & tight spacing */
+    .page-max-h { max-height: 180vh; }
+  </style>
+</head>
+<body class="antialiased text-gray-900 bg-white">
+
+<!-- ===================== NAVBAR (Flowbite Marketing: Header) ===================== -->
+<header class="sticky top-0 z-40 backdrop-blur supports-[backdrop-filter]:bg-white/70 bg-white/60 border-b border-gray-200">
+  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+    <div class="flex h-14 items-center justify-between">
+      <a href="#top" class="flex items-center gap-2">
+        <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-sky-600 text-white font-bold">R</span>
+        <span class="text-base font-semibold tracking-tight">ReMic</span>
+      </a>
+      <div class="flex items-center gap-3">
+        <a href="#demo" class="hidden sm:inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          Watch Demo
+        </a>
+        <a href="#waitlist" class="inline-flex items-center rounded-lg bg-sky-600 px-4 py-2 text-sm font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">Join waitlist</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main id="top" class="page-max-h">
+  <!-- ===================== HERO (Flowbite Marketing: Hero + Newsletter + Modal) ===================== -->
+  <section class="relative isolate overflow-hidden">
+    <div class="absolute inset-0 -z-10 bg-gradient-to-b from-sky-50 via-white to-white"></div>
+
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-14 pb-8">
+      <div class="grid lg:grid-cols-2 gap-10 items-center">
+
+        <!-- Copy block -->
+        <div>
+          <h1 class="text-4xl sm:text-5xl font-extrabold leading-tight tracking-tight text-gray-900">
+            ReMic: <span class="text-sky-700">where your voice never waits for translation.</span>
+          </h1>
+          <p class="mt-5 text-lg text-gray-700">
+            Forget turn‑taking translators — ReMic is your always‑on AI interpreter, streaming your words across languages in real time.
+          </p>
+          <p class="mt-4 text-gray-600 italic">
+            “Imagine traveling abroad and chatting with locals — no awkward pauses, no waiting for apps. With ReMic, you both just talk. As you speak, it’s instantly translated and spoken back in the other language — like magic subtitles for real life.”
+          </p>
+
+          <!-- Social-proof badges (minimalist) -->
+          <div class="mt-6 flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600">
+              <span class="h-2 w-2 rounded-full bg-emerald-500"></span> Simultaneous Interpretation (SI)
+            </span>
+            <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600">
+              <span class="h-2 w-2 rounded-full bg-sky-500"></span> Always‑on, no barge‑in
+            </span>
+            <span class="inline-flex items-center gap-2 rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600">
+              <span class="h-2 w-2 rounded-full bg-fuchsia-500"></span> LLM Beauty Filter
+            </span>
+          </div>
+
+          <!-- CTA: Waitlist form (Flowbite Marketing: Newsletter) -->
+          <form id="waitlist" class="mt-8 max-w-lg" onsubmit="return handleSignup(event)">
+            <label for="email" class="mb-2 block text-sm font-medium text-gray-900">Join the waitlist</label>
+            <div class="flex flex-col sm:flex-row gap-3">
+              <div class="relative flex-1">
+                <div class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                  <svg aria-hidden="true" class="h-5 w-5 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M2.94 6.34 10 10.88l7.06-4.54A2 2 0 0 0 15.94 5H4.06a2 2 0 0 0-1.12 1.34Z"></path><path d="M18 8.12 10 12.88 2 8.12V14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8.12Z"></path></svg>
+                </div>
+                <input required type="email" id="email" name="email" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-3 pl-10 text-sm text-gray-900 focus:border-sky-500 focus:ring-sky-500" placeholder="you@company.com" />
+              </div>
+              <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white hover:bg-sky-700 focus:outline-none focus:ring-4 focus:ring-sky-200">
+                Join waitlist
+              </button>
+            </div>
+            <p class="mt-2 text-xs text-gray-500">We’ll only email you about the launch. Unsubscribe anytime.</p>
+          </form>
+
+          <!-- Secondary CTA -->
+          <div class="mt-6 flex items-center gap-4">
+            <button data-modal-target="demoModal" data-modal-toggle="demoModal" class="inline-flex items-center gap-2 text-sm text-gray-700 hover:text-gray-900">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Watch 20s demo
+            </button>
+            <a href="#learn" class="text-sm text-gray-700 hover:text-gray-900">How it works</a>
+          </div>
+        </div>
+
+        <!-- Visual block -->
+        <div class="relative">
+          <div class="rounded-2xl border border-gray-200 bg-white/70 shadow-xl backdrop-blur p-4">
+            <video id="demoVideo" class="w-full rounded-xl" autoplay muted loop playsinline>
+              <source src="/remic-demo.mp4" type="video/mp4" />
+            </video>
+            <div class="mt-3 flex items-center justify-between">
+              <p class="text-xs text-gray-500">Live simultaneous interpretation demo</p>
+              <button data-modal-target="demoModal" data-modal-toggle="demoModal" class="inline-flex items-center gap-1 rounded-lg border border-gray-200 px-3 py-1.5 text-xs text-gray-700 hover:bg-gray-50">Open full video</button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo Modal (Flowbite Modal) -->
+  <div id="demoModal" tabindex="-1" aria-hidden="true" class="hidden fixed inset-0 z-50 overflow-y-auto overflow-x-hidden p-4">
+    <div class="relative max-w-3xl w-full mx-auto mt-16">
+      <div class="relative rounded-lg bg-white shadow-lg">
+        <div class="flex items-center justify-between border-b p-4">
+          <h3 class="text-base font-semibold">ReMic — 20s demo</h3>
+          <button type="button" class="text-gray-400 hover:text-gray-600" data-modal-hide="demoModal">
+            <span class="sr-only">Close</span>
+            <svg class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          </button>
+        </div>
+        <div class="p-4">
+          <video class="w-full rounded-lg" controls>
+            <source src="/remic-demo.mp4" type="video/mp4" />
+          </video>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SECTION 2 (the “half page”): Why & How, compact ===================== -->
+  <section id="learn" class="relative border-t border-gray-200 bg-white">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-14">
+      <div class="grid lg:grid-cols-2 gap-12 items-start">
+
+        <!-- Why ReMic (Flowbite Marketing: Features grid) -->
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight">Why simultaneous interpretation matters</h2>
+          <p class="mt-3 text-gray-600">Conversations should flow, not buffer. ReMic streams across languages in real time so humans can stay human.</p>
+          <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="rounded-lg border border-gray-200 p-4">
+              <div class="flex items-center gap-2">
+                <span class="h-6 w-6 inline-flex items-center justify-center rounded bg-sky-100 text-sky-700">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12h14M12 5v14"/></svg>
+                </span>
+                <h3 class="font-semibold">Always‑on streaming</h3>
+              </div>
+              <p class="mt-2 text-sm text-gray-600">No turn‑taking. Two people can talk naturally while ReMic keeps translating.</p>
+            </div>
+            <div class="rounded-lg border border-gray-200 p-4">
+              <div class="flex items-center gap-2">
+                <span class="h-6 w-6 inline-flex items-center justify-center rounded bg-emerald-100 text-emerald-700">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M5 12l4 4L19 6"/></svg>
+                </span>
+                <h3 class="font-semibold">Human SI feel</h3>
+              </div>
+              <p class="mt-2 text-sm text-gray-600">Short, rolling clauses (~0.7–1.2s) for natural pacing, clarity, and continuity.</p>
+            </div>
+            <div class="rounded-lg border border-gray-200 p-4">
+              <div class="flex items-center gap-2">
+                <span class="h-6 w-6 inline-flex items-center justify-center rounded bg-fuchsia-100 text-fuchsia-700">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l2.5 7.5H22l-6 4.5 2.5 7.5L12 18l-6 4.5L8.5 15 2 10.5h7.5z"/></svg>
+                </span>
+                <h3 class="font-semibold">LLM Beauty Filter</h3>
+              </div>
+              <p class="mt-2 text-sm text-gray-600">Tone and style you choose — without changing facts or names.</p>
+            </div>
+            <div class="rounded-lg border border-gray-200 p-4">
+              <div class="flex items-center gap-2">
+                <span class="h-6 w-6 inline-flex items-center justify-center rounded bg-amber-100 text-amber-700">
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M13 2H6a2 2 0 00-2 2v16l7-3 7 3V9"/></svg>
+                </span>
+                <h3 class="font-semibold">Low‑latency voices</h3>
+              </div>
+              <p class="mt-2 text-sm text-gray-600">Natural, streaming TTS tuned for fast first audio byte.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- How it works (Flowbite Marketing: Steps/Timeline condensed) -->
+        <div>
+          <h2 class="text-2xl font-bold tracking-tight">How ReMic works</h2>
+          <ol class="mt-4 space-y-3">
+            <li class="flex items-start gap-3">
+              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white text-xs font-bold">1</span>
+              <div>
+                <h4 class="font-semibold">Listen</h4>
+                <p class="text-sm text-gray-600">Low‑latency ASR streams partials and stabilizes short clauses continuously.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white text-xs font-bold">2</span>
+              <div>
+                <h4 class="font-semibold">Translate</h4>
+                <p class="text-sm text-gray-600">Speech‑translation delivers live target text as you speak — no session stops.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white text-xs font-bold">3</span>
+              <div>
+                <h4 class="font-semibold">Beautify</h4>
+                <p class="text-sm text-gray-600">A streaming LLM lightly rewrites for tone and clarity — faithfulness preserved.</p>
+              </div>
+            </li>
+            <li class="flex items-start gap-3">
+              <span class="mt-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-900 text-white text-xs font-bold">4</span>
+              <div>
+                <h4 class="font-semibold">Speak</h4>
+                <p class="text-sm text-gray-600">Streaming TTS voices output immediately with soft cross‑fades between clauses.</p>
+              </div>
+            </li>
+          </ol>
+
+          <!-- Compact FAQ (Flowbite Marketing: FAQ/Accordion) -->
+          <div class="mt-8">
+            <div id="accordion-flush" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-600">
+              <h3 id="faq-1">
+                <button type="button" class="flex w-full items-center justify-between py-3 text-left text-sm" data-accordion-target="#faq-1-body" aria-expanded="false" aria-controls="faq-1-body">
+                  <span class="font-medium">Is this different from normal translation apps?</span>
+                  <svg data-accordion-icon class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+              </h3>
+              <div id="faq-1-body" class="hidden" aria-labelledby="faq-1">
+                <div class="pb-4 text-sm text-gray-600">Yes — ReMic is <em>simultaneous</em>. There’s no turn‑taking; we translate as you speak so conversations stay natural.</div>
+              </div>
+              <h3 id="faq-2" class="border-t border-gray-200">
+                <button type="button" class="flex w-full items-center justify-between py-3 text-left text-sm" data-accordion-target="#faq-2-body" aria-expanded="false" aria-controls="faq-2-body">
+                  <span class="font-medium">Which languages will be supported?</span>
+                  <svg data-accordion-icon class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                </button>
+              </h3>
+              <div id="faq-2-body" class="hidden" aria-labelledby="faq-2">
+                <div class="pb-4 text-sm text-gray-600">We’re prioritizing the most common travel & business pairs at launch; full list will expand rapidly.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Final CTA (Flowbite Marketing: CTA/Newsletter compact) -->
+          <div class="mt-8 rounded-2xl border border-gray-200 p-5">
+            <h3 class="font-semibold">Be first to try ReMic</h3>
+            <form class="mt-3 flex flex-col sm:flex-row gap-3" onsubmit="return handleSignup(event)">
+              <input required type="email" class="block w-full rounded-lg border border-gray-300 bg-gray-50 p-3 text-sm focus:border-sky-500 focus:ring-sky-500" placeholder="you@company.com" />
+              <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-gray-900 px-5 py-3 text-sm font-semibold text-white hover:bg-black focus:outline-none focus:ring-4 focus:ring-gray-300">Join waitlist</button>
+            </form>
+            <p class="mt-2 text-xs text-gray-500">No spam — just the launch email and early access invite.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- ===================== FOOTER (minimal) ===================== -->
+<footer class="border-t border-gray-200">
+  <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-sm text-gray-600">
+    <p>© <span id="y"></span> ReMic. All rights reserved.</p>
+    <div class="flex items-center gap-4">
+      <a href="#waitlist" class="text-gray-700 hover:text-gray-900">Join waitlist</a>
+      <a href="#demo" class="text-gray-700 hover:text-gray-900">Demo</a>
+      <a href="#learn" class="text-gray-700 hover:text-gray-900">How it works</a>
+    </div>
+  </div>
+</footer>
+
+<!-- Flowbite JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.5.1/flowbite.min.js"></script>
+<script>
+  // Minimal, backend-agnostic waitlist handler (replace with your API)
+  function handleSignup(e){
+    e.preventDefault();
+    const form = e.target.closest('form');
+    const email = form.querySelector('input[type="email"]').value.trim();
+    if(!email) return false;
+    // TODO: replace with real endpoint fetch
+    console.log('[ReMic] captured waitlist email:', email);
+    // Simple success state
+    form.innerHTML = `<div class="inline-flex items-center gap-2 rounded-lg bg-emerald-50 px-3 py-2 text-emerald-700"><svg class=\"h-4 w-4\" viewBox=\"0 0 24 24\" fill=\"currentColor\"><path d=\"M5 12l4 4L19 6\"/></svg>Thanks! You’re on the list.</div>`;
+    return false;
+  }
+  // Year stamp
+  document.getElementById('y').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
