@@ -231,6 +231,10 @@ The concept is simple. Everyone in the group launches the app, and the “leader
 
 While Forum is optimally designed for presentations or group meetings where one person is doing most of the talking and the bulk of the other session members are mostly listening in silence, it doesn’t have to work that way. Any number of participants can actively speak in their own language and have their comments translated for the group, each receiving a different translated language. 25 people could be speaking in 25 different languages, and the app will translate them all into each listener’s chosen tongue, in both text and voice, as selected.
 
+## Tutorials
+
+- [What is WebRTC by WebRTC.ventures](https://youtu.be/0XceZw0Ktn0)
+
 ---
 
 ## 📜 License
