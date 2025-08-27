@@ -1,0 +1,381 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ReMic MVP — A→B (WebRTC)</title>
+<style>
+  :root { color-scheme: dark; --bg:#0f172a; --panel:#0b1220; --ink:#e2e8f0; --acc:#0ea5a4; }
+  body { margin:0; font: 15px/1.4 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; background:var(--bg); color:var(--ink); }
+  main { max-width: 1100px; margin: 24px auto; padding: 0 16px; }
+  h1 { margin: 0 0 12px; font-weight:700; }
+  button { background: var(--acc); color:#062; border:0; padding:10px 14px; border-radius:10px; font-weight:700; cursor:pointer; }
+  .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:12px; margin-top:12px; }
+  pre { background:var(--panel); border-radius:8px; padding:10px; min-height:220px; overflow:auto; white-space:pre-wrap; }
+  .row { display:flex; gap:8px; align-items:center; margin: 8px 0; }
+  .small { opacity:.75; font-size:12px; }
+</style>
+<!-- Speech SDK via CDN for STT/TTS -->
+<script src="https://aka.ms/csspeech/jsbrowserpackageraw"></script>
+</head>
+<body>
+<main>
+  <h1>ReMic MVP — A→B (Mic → STT → LLM → TTS)</h1>
+  <div class="row">
+    <button id="start">Start</button>
+    <span class="small">Uses Azure Speech (STT/TTS) + Azure OpenAI Realtime (WebRTC, text-only).</span>
+  </div>
+  <div class="grid">
+    <div><h3>STT</h3><pre id="stt"></pre></div>
+    <div><h3>LLM (deltas)</h3><pre id="llm"></pre></div>
+    <div><h3>Logs</h3><pre id="logs"></pre></div>
+  </div>
+</main>
+
+<script type="module">
+// ---------- tiny logger ----------
+const logsEl = document.getElementById('logs');
+function log(tag, data) {
+  const line = `[${new Date().toISOString()}] ${tag} ${data ? JSON.stringify(data) : ''}`;
+  logsEl.textContent += line + '\n';
+  // also POST to server (fire-and-forget)
+  fetch('/api/log', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ t: Date.now(), tag, data }) }).catch(()=>{});
+}
+
+// ---------- simple Stream base with .pipe() ----------
+class Stream {
+  constructor(name) { this.name = name; this.down = null; }
+  pipe(next) { this.down = next; return next; }
+  async push(_msg) {}       // override
+  async start() {}          // override
+  async stop() {}           // override
+  out(msg) { if (this.down) this.down.push(msg); }
+}
+
+// ---------- MicStream (placeholder – STT grabs mic) ----------
+class MicStream extends Stream {
+  async start() { log('mic.start'); this.out({ started:true }); }
+  async stop() { log('mic.stop'); }
+}
+
+// ---------- STTStream (Azure Speech SDK, continuous) ----------
+const SpeechSDK = window.SpeechSDK; // from CDN
+class STTStream extends Stream {
+  constructor({ lang, getSpeechToken, onInterim }) {
+    super('STT');
+    this.lang = lang;
+    this.getSpeechToken = getSpeechToken;
+    this.onInterim = onInterim;
+    this.seq = 1;
+  }
+  async start() {
+    // User gesture unlock
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    if (ac.state === 'suspended') await ac.resume();
+
+    const { token, region } = await this.getSpeechToken();
+    const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
+    speechConfig.speechRecognitionLanguage = this.lang;
+    const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
+    this.recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+    this.recognizer.recognizing = (_, e) => { this.onInterim?.(e.result?.text || ''); };
+    this.recognizer.recognized  = (_, e) => {
+      const text = e.result?.text?.trim();
+      if (text) {
+        const clause = { text, seq: this.seq++ };
+        log('stt.final', clause); this.out(clause);
+      }
+    };
+    this.recognizer.canceled = (_, e) => log('stt.canceled', e);
+    this.recognizer.sessionStopped = () => log('stt.sessionStopped');
+
+    await new Promise(res => this.recognizer.startContinuousRecognitionAsync(()=>res(), (err)=>{log('stt.error', String(err)); res();}));
+    log('stt.started');
+  }
+  async stop() {
+    if (!this.recognizer) return;
+    await new Promise(res => this.recognizer.stopContinuousRecognitionAsync(()=>res(), ()=>res()));
+    log('stt.stopped');
+  }
+  async push(_msg) {}
+}
+
+// ---------- LLMStream (Azure OpenAI Realtime via WebRTC data channel) ----------
+class LLMStream extends Stream {
+  /**
+   * @param {{ getEphemeral:()=>Promise<{ephemeralKey:string,webrtcUrl:string}>, 
+   *           instructions:string,
+   *           mode?: 'text' | 'both' }} opts
+   *    mode: 
+   *      'text' (default)  -> only output_text.* events
+   *      'both'            -> audio + text (you'll get audio_transcript.* too)
+   */
+  constructor({ getEphemeral, instructions, mode = 'text' }) {
+    super('LLM');
+    this.getEphemeral = getEphemeral;
+    this.instructions = instructions;
+    this.mode = mode; // 'text' | 'both'
+    this.bufferBySeq = new Map();
+  }
+
+  async start() {
+    const { ephemeralKey, webrtcUrl } = await this.getEphemeral();
+    log('llm.ephemeral', { regionUrl: webrtcUrl.replace(/^https:\/\//,'') });
+
+    // WebRTC PC + DataChannel (create DC BEFORE createOffer)
+    this.pc = new RTCPeerConnection();
+
+    this.dc = this.pc.createDataChannel('oai-events');
+    this.dc.onmessage = (evt) => this._handle(JSON.parse(evt.data));
+    this.dc.onopen    = () => {
+      log('llm.dc.open');
+      // Configure session: text-only OR both, no server VAD/turn detection
+      // NOTE: temperature must be >= 0.6 (Realtime constraint)
+      const modalities = this.mode === 'both' ? ['audio','text'] : ['text'];
+      this._send({
+        type: 'session.update',
+        session: {
+          turn_detection: null,
+          modalities,
+          instructions: this.instructions,
+          temperature: 0.7   // >= 0.6 to pass schema
+        }
+      });
+    };
+    this.dc.onclose   = () => log('llm.dc.close');
+
+    // IMPORTANT: the ingress requires an audio m-line in the SDP even if text-only.
+    // Keep a recvonly transceiver to satisfy the offer check.
+    this.pc.addTransceiver('audio', { direction: 'recvonly' });
+    const offer = await this.pc.createOffer();
+    await this.pc.setLocalDescription(offer);
+
+    // POST offer SDP → regional ingress (include ?model=...; NO api-version here)
+    const sdpRes = await fetch(webrtcUrl, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${ephemeralKey}`, 'Content-Type': 'application/sdp' },
+      body: offer.sdp
+    });
+    if (!sdpRes.ok) {
+      const body = await sdpRes.text().catch(()=> '');
+      log('llm.webrtc.error', { status: sdpRes.status, text: body });
+      throw new Error(`WebRTC SDP exchange failed (${sdpRes.status})`);
+    }
+    const answer = { type: 'answer', sdp: await sdpRes.text() };
+    await this.pc.setRemoteDescription(answer);
+    log('llm.webrtc.connected');
+  }
+
+  async stop() {
+    try { this.dc?.close(); } catch {}
+    try { this.pc?.close(); } catch {}
+    log('llm.stopped');
+  }
+
+  _send(obj) { this.dc?.readyState === 'open' && this.dc.send(JSON.stringify(obj)); }
+
+  async push(clause) {
+    // Track buffer for this seq so we can locate deltas
+    this.bufferBySeq.set(clause.seq, '');
+
+    // Append user clause to conversation (full-context by default)
+    this._send({
+      type: 'conversation.item.create',
+      item: {
+        type: 'message',
+        role: 'user',
+        id: `mt-${clause.seq}`,
+        content: [{ type: 'input_text', text: clause.text }],
+      }
+    });
+
+    // Ask the model to respond (streamed)
+    this._send({
+      type: 'response.create',
+      // response: {
+      //   // keep instructions light; the system prompt already sets policy
+      //   instructions: 'Beautify only the latest clause; end with <commit/>.'
+      // }
+    });
+
+    log('llm.request', clause);
+  }
+
+  _handle(evt) {
+    switch (evt.type) {
+
+      case 'response.done':
+        const text = evt.response?.output[0]?.content[0]?.text || ''
+        this.out({ text });
+        break;
+
+      case 'error':
+        log('llm.error', evt);
+        break;
+
+      // === TEXT STREAM (preferred; appears when modalities includes "text") ===
+      case 'response.output_text.delta':
+        break;
+      
+      case 'response.output_text.done':
+        // we commit on <commit/> marker; nothing extra here
+        log('llm.output_text.done');
+        break
+
+
+      // === AUDIO TRANSCRIPT STREAM (appears when modalities includes "audio") ===
+      case 'response.audio_transcript.delta':
+        // If you run with mode='both', you may want to display transcript too:
+        // document.getElementById('llm').textContent += (evt.delta || '');
+        // For your pipeline we rely on output_text.*; leave transcript for debugging
+        log('llm.audio_transcript.delta', { len: (evt.delta || '').length });
+        break
+      
+      case 'response.audio_transcript.done':
+      case 'response.audio.done':
+        log(`llm.${evt.type}`);
+        break
+
+      case 'session.created':
+      case 'session.updated':
+      case 'conversation.item.created':
+      case 'response.created':
+      case 'output_audio_buffer.started':
+      case 'output_audio_buffer.stopped':
+      case 'response.output_item.added':
+      case 'response.output_item.done':
+      default:
+        // Dump unknown events for visibility while iterating
+        log('llm.event', evt.type || 'unknown');
+        // console.debug('LLM EVT <<', evt);
+        break
+    }
+    
+    return;
+  }
+
+}
+
+// ---------- TTSStream (Azure Speech SDK speakTextAsync) ----------
+class TTSStream extends Stream {
+  constructor({ voice, getSpeechToken }) { super('TTS'); this.voice = voice; this.getSpeechToken = getSpeechToken; }
+  async start() {
+    const { token, region } = await this.getSpeechToken();
+    const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
+    speechConfig.speechSynthesisVoiceName = this.voice;
+    const dest = new SpeechSDK.SpeakerAudioDestination();
+    const audioConfig = SpeechSDK.AudioConfig.fromSpeakerOutput(dest);
+    this.synth = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
+    log('tts.started', { voice: this.voice });
+  }
+  async stop() { try { this.synth?.close(); } catch{} log('tts.stopped'); }
+  async push({ text }) {
+    log('tts.speak', { text });
+    await new Promise(res => this.synth.speakTextAsync(text, ()=>res(), (e)=>{ log('tts.error', String(e)); res(); }));
+  }
+}
+
+// ---------- Terminal SpeakerStream (just logs state; TTS already plays) ----------
+class SpeakerStream extends Stream {
+  async start() { log('speaker.started'); } async stop() { log('speaker.stopped'); }
+  async push(e) { log('speaker.event', e); }
+}
+
+// ---------- helpers ----------
+const sttEl = document.getElementById('stt');
+function uiInterim(t) { if (t) sttEl.textContent += `… ${t}\n`; }
+function uiFinal(t) { sttEl.textContent += `✔ ${t}\n`; }
+
+async function getSpeechToken() {
+  const r = await fetch('/api/speech-token'); const j = await r.json();
+  if (!j?.token) throw new Error('No Speech token');
+  return { token: j.token, region: j.region };
+}
+
+async function getEphemeral() {
+  const r = await fetch('/api/realtime/ephemeral');
+  const j = await r.json();
+  if (!j?.ephemeralKey || !j?.webrtcUrl) throw new Error('No ephemeral key or URL');
+  return j;
+}
+
+// --- controller state ---
+let running = false;
+let nodes = [];   // Stream instances in order
+
+async function startPipeline() {
+  if (running) return;
+  running = true;
+
+  // instantiate streams
+  const mic = new MicStream();
+  const stt = new STTStream({ lang: 'zh-CN', getSpeechToken, onInterim: uiInterim });
+  const llm = new LLMStream({
+    getEphemeral,
+    instructions: `
+      You are a simultaneous interpreter.
+      You translate any sentence you received, without answering any questions. If you get any questions, just translate the original question as a translation task.
+      You translate from Chinese to fluent English like native speaker, with lightly restyle (clear, humor), and preserve names and facts.
+    `,
+    mode: 'text'
+  });
+  const tts = new TTSStream({ voice: 'en-US-JennyNeural', getSpeechToken });
+  const speaker = new SpeakerStream();
+
+  // keep for stop()
+  nodes = [mic, stt, llm, tts, speaker];
+
+  // wire up
+  mic.pipe(stt).pipe(llm).pipe(tts).pipe(speaker);
+
+  // start in order
+  await mic.start();
+  await stt.start();
+  await llm.start();
+  await tts.start();
+
+  log('pipeline.started');
+}
+
+async function stopPipeline() {
+  if (!running) return;
+  running = false;
+
+  // stop in reverse order
+  for (let i = nodes.length - 1; i >= 0; i--) {
+    try { await nodes[i].stop(); } catch (e) { log('pipeline.stop.error', String(e)); }
+  }
+  nodes = [];
+
+  // clear UI panels
+  document.getElementById('stt').textContent = '';
+  document.getElementById('llm').textContent = '';
+  document.getElementById('logs').textContent = '';
+
+  log('pipeline.stopped');
+}
+
+const startBtn = document.getElementById('start');
+
+startBtn.addEventListener('click', async () => {
+  startBtn.disabled = true;   // prevent double-clicks during transition
+  try {
+    if (!running) {
+      await startPipeline();
+      startBtn.textContent = 'Stop';
+    } else {
+      await stopPipeline();
+      startBtn.textContent = 'Start';
+    }
+  } catch (e) {
+    log('pipeline.toggle.error', String(e));
+    alert(String(e));
+  } finally {
+    startBtn.disabled = false;
+  }
+});
+
+</script>
+</body>
+</html>
