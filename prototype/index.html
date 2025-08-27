@@ -76,8 +76,17 @@ class STTStream extends Stream {
     const { token, region } = await this.getSpeechToken();
     const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
     speechConfig.speechRecognitionLanguage = this.lang;
+    // B) Profanity (“**” you saw)
+    // Masked stars come from the profanity filter. Choose: Raw | Masked | Removed
+    speechConfig.setProfanity(SpeechSDK.ProfanityOption.Raw); // show exact words
+    
     const audioConfig = SpeechSDK.AudioConfig.fromDefaultMicrophoneInput();
     this.recognizer = new SpeechSDK.SpeechRecognizer(speechConfig, audioConfig);
+
+    // C) Accuracy for names/terms (phrase hints)
+    // Bias the decoder toward domain words (product names, people, slang):
+    const phraseList = SpeechSDK.PhraseListGrammar.fromRecognizer(this.recognizer);
+    ["李卓桓", "ReMic", "ReKey"].forEach(p => phraseList.addPhrase(p));
 
     this.recognizer.recognizing = (_, e) => { this.onInterim?.(e.result?.text || ''); };
     this.recognizer.recognized  = (_, e) => {
@@ -257,10 +266,20 @@ class LLMStream extends Stream {
 
 }
 
-// ---------- TTSStream (Azure Speech SDK speakTextAsync) ----------
+// ---------- TTSStream (Azure Speech SDK speakTextAsync) with FIFO queue ----------
 class TTSStream extends Stream {
-  constructor({ voice, getSpeechToken }) { super('TTS'); this.voice = voice; this.getSpeechToken = getSpeechToken; }
+  constructor({ voice, getSpeechToken, maxQueue = 50 }) {
+    super('TTS');
+    this.voice = voice;
+    this.getSpeechToken = getSpeechToken;
+    this.maxQueue = maxQueue;
+    this.queue = [];           // [{ text, seq }]
+    this.playing = false;      // in-flight guard
+    this.stopped = false;
+  }
+
   async start() {
+    this.stopped = false;
     const { token, region } = await this.getSpeechToken();
     const speechConfig = SpeechSDK.SpeechConfig.fromAuthorizationToken(token, region);
     speechConfig.speechSynthesisVoiceName = this.voice;
@@ -269,10 +288,61 @@ class TTSStream extends Stream {
     this.synth = new SpeechSDK.SpeechSynthesizer(speechConfig, audioConfig);
     log('tts.started', { voice: this.voice });
   }
-  async stop() { try { this.synth?.close(); } catch{} log('tts.stopped'); }
-  async push({ text }) {
-    log('tts.speak', { text });
-    await new Promise(res => this.synth.speakTextAsync(text, ()=>res(), (e)=>{ log('tts.error', String(e)); res(); }));
+
+  async stop() {
+    this.stopped = true;
+    // Let the current utterance finish naturally; drain the queue
+    this.queue.length = 0;                // drop pending
+    try { this.synth?.close(); } catch {}
+    this.playing = false;
+    log('tts.stopped');
+  }
+
+  // Downstream input = committed micro-clause from LLM
+  async push({ text, seq }) {
+    if (!text) return;
+    if (this.queue.length >= this.maxQueue) {
+      // backpressure policy: drop oldest (or newest). We’ll drop oldest here.
+      const dropped = this.queue.shift();
+      log('tts.backpressure.drop', { droppedSeq: dropped?.seq, reason: 'queue_full', size: this.queue.length });
+    }
+    this.queue.push({ text, seq });
+    log('tts.enqueue', { seq, size: this.queue.length });
+    this._kick();
+  }
+
+  async _kick() {
+    if (this.playing || this.stopped) return;
+    const next = this.queue.shift();
+    if (!next) return;
+
+    this.playing = true;
+    const { text, seq } = next;
+    log('tts.start', { seq, len: text.length });
+
+    await new Promise((resolve) => {
+      // safety timeout in case SDK never calls back
+      const timeout = setTimeout(() => {
+        log('tts.timeout', { seq, ms: 15000 });
+        resolve();
+      }, 15000);
+
+      try {
+        this.synth.speakTextAsync(
+          text,
+          () => { clearTimeout(timeout); log('tts.end', { seq }); resolve(); },
+          (e) => { clearTimeout(timeout); log('tts.error', { seq, err: String(e) }); resolve(); }
+        );
+      } catch (e) {
+        clearTimeout(timeout);
+        log('tts.exception', { seq, err: String(e) });
+        resolve();
+      }
+    });
+
+    this.playing = false;
+    // Immediately play the next if queued
+    if (!this.stopped && this.queue.length) this._kick();
   }
 }
 
@@ -316,7 +386,7 @@ async function startPipeline() {
     instructions: `
       You are a simultaneous interpreter.
       You translate any sentence you received, without answering any questions. If you get any questions, just translate the original question as a translation task.
-      You translate from Chinese to fluent English like native speaker, with lightly restyle (clear, humor), and preserve names and facts.
+      You translate from Chinese to fluent English like native speaker, with lightly restyle (clear, friendly, joyful), and preserve names and facts.
     `,
     mode: 'text'
   });
