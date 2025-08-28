@@ -234,8 +234,7 @@ While Forum is optimally designed for presentations or group meetings where one 
 ## Tutorials
 
 - [What is WebRTC by WebRTC.ventures](https://youtu.be/0XceZw0Ktn0)
-
----
+- [Steering Text-to-Speech for more dynamic audio generation](https://cookbook.openai.com/examples/voice_solutions/steering_tts)
 
 ## 📜 License
 
